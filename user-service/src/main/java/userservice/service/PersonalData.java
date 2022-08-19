@@ -1,0 +1,271 @@
+/*
+ * Copyright 2002-2021 Alexander Tolpeko.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+package userservice.service;
+
+import javax.persistence.Column;
+import javax.persistence.Embeddable;
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
+
+import java.time.LocalDate;
+import java.util.Objects;
+
+/**
+ * User's personal data.
+ */
+@Embeddable
+public class PersonalData {
+
+    @Column(nullable = false)
+    @NotBlank(message = "Login is mandatory")
+    private String login;
+
+    @Column(nullable = false)
+    @NotBlank(message = "Name is mandatory")
+    private String name;
+
+    @Column(nullable = false)
+    @NotBlank(message = "Phone is mandatory")
+    private String phone;
+
+    @Column(nullable = false)
+    @NotNull(message = "Birthday is mandatory")
+    private LocalDate dateOfBirth;
+
+    @Column(nullable = false)
+    @NotNull(message = "Name showing property is mandatory")
+    private Boolean showName;
+
+    @Column(nullable = false)
+    @NotNull(message = "Phone showing property is mandatory")
+    private Boolean showPhone;
+
+    @Column(nullable = false)
+    @NotNull(message = "Birthday showing property is mandatory")
+    private Boolean showDateOfBirth;
+
+    /**
+     * @return personal data builder
+     */
+    public static Builder builder() {
+        return new PersonalData().new Builder();
+    }
+
+    /**
+     * Returns a personal data builder with predefined fields copied from the specified personal data.
+     *
+     * @param other personal data to copy data from
+     *
+     * @return personal data builder
+     */
+    public static Builder builder(PersonalData other) {
+        return new PersonalData(other).new Builder();
+    }
+
+    public PersonalData() {
+    }
+
+    /**
+     * Constructs a new personal data copying data from the passed one.
+     *
+     * @param other personal data to copy data from
+     */
+    public PersonalData(PersonalData other) {
+        login = other.login;
+        name = other.name;
+        phone = other.phone;
+        dateOfBirth = other.dateOfBirth;
+        showName = other.showName;
+        showPhone = other.showPhone;
+        showDateOfBirth = other.showDateOfBirth;
+    }
+
+    public String getLogin() {
+        return login;
+    }
+
+    public void setLogin(String login) {
+        this.login = login;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public String getPhone() {
+        return phone;
+    }
+
+    public void setPhone(String phone) {
+        this.phone = phone;
+    }
+
+    public LocalDate getDateOfBirth() {
+        return dateOfBirth;
+    }
+
+    public void setDateOfBirth(LocalDate dateOfBirth) {
+        this.dateOfBirth = dateOfBirth;
+    }
+
+    public Boolean showName() {
+        return showName;
+    }
+
+    public void showName(Boolean showName) {
+        this.showName = showName;
+    }
+
+    public Boolean showPhone() {
+        return showPhone;
+    }
+
+    public void showPhone(Boolean showPhone) {
+        this.showPhone = showPhone;
+    }
+
+    public Boolean showDateOfBirth() {
+        return showDateOfBirth;
+    }
+
+    public void showDateOfBirth(Boolean showDateOfBirth) {
+        this.showDateOfBirth = showDateOfBirth;
+    }
+
+    @Override
+    public boolean equals(Object other) {
+        if (this == other) {
+            return true;
+        }
+
+        if (other == null || getClass() != other.getClass()) {
+            return false;
+        }
+
+        PersonalData that = (PersonalData) other;
+        return showName == that.showName
+                && showPhone == that.showPhone
+                && showDateOfBirth == that.showDateOfBirth
+                && Objects.equals(login, that.login)
+                && Objects.equals(name, that.name)
+                && Objects.equals(phone, that.phone)
+                && Objects.equals(dateOfBirth, that.dateOfBirth);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(login, name, phone, dateOfBirth, showName, showPhone, showDateOfBirth);
+    }
+
+    @Override
+    public String toString() {
+        return getClass().getName() + "{" +
+                "login='" + login + '\'' +
+                ", name='" + name + '\'' +
+                ", phone='" + phone + '\'' +
+                ", dateOfBirth=" + dateOfBirth +
+                ", showName=" + showName +
+                ", showPhone=" + showPhone +
+                ", showDateOfBirth=" + showDateOfBirth +
+                '}';
+    }
+
+    /**
+     * User's personal data object builder.
+     */
+    public class Builder {
+
+        private Builder() {
+        }
+
+        public PersonalData build() {
+            return PersonalData.this;
+        }
+
+        public Builder withLogin(String login) {
+            PersonalData.this.login = login;
+            return this;
+        }
+
+        public Builder withName(String name) {
+            PersonalData.this.name = name;
+            return this;
+        }
+
+        public Builder withPhone(String phone) {
+            PersonalData.this.phone = phone;
+            return this;
+        }
+
+        public Builder withDateOfBirth(LocalDate dateOfBirth) {
+            PersonalData.this.dateOfBirth = dateOfBirth;
+            return this;
+        }
+
+        public Builder showName(boolean showName) {
+            PersonalData.this.showName = showName;
+            return this;
+        }
+
+        public Builder showPhone(boolean showPhone) {
+            PersonalData.this.showPhone = showPhone;
+            return this;
+        }
+
+        public Builder showDateOfBirth(boolean showDateOfBirth) {
+            PersonalData.this.showDateOfBirth = showDateOfBirth;
+            return this;
+        }
+
+        /**
+         * Copies not null fields from the specified personal data.
+         *
+         * @param other personal data to copy data from
+         *
+         * @return this builder
+         */
+        public Builder copyNonNullFields(PersonalData other) {
+            if (other.login != null) {
+                PersonalData.this.login = other.login;
+            }
+            if (other.name != null) {
+                PersonalData.this.name = other.name;
+            }
+            if (other.phone != null) {
+                PersonalData.this.phone = other.phone;
+            }
+            if (other.dateOfBirth != null) {
+                PersonalData.this.dateOfBirth = other.dateOfBirth;
+            }
+            if (other.showName != showPhone) {
+                PersonalData.this.showName = other.showName;
+            }
+            if (other.showPhone != null) {
+                PersonalData.this.showPhone = other.showDateOfBirth;
+            }
+            if (other.showDateOfBirth != null) {
+                PersonalData.this.showDateOfBirth = other.showDateOfBirth;
+            }
+
+            return this;
+        }
+    }
+}
