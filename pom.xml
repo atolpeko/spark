@@ -15,7 +15,7 @@
     </parent>
 
     <modules>
-       
+        <module>user-service</module>
     </modules>
 
     <properties>
