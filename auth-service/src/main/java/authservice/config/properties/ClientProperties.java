@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package authserver.config.properties;
+package authservice.config.properties;
 
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Configuration;
@@ -27,26 +27,30 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 /**
- * User properties loaded from the configuration file.
+ * Client properties loaded from the configuration file.
  */
 @Configuration
 @ConfigurationProperties(prefix = "oauth")
 @Component
-public class UserProperties {
-    private List<User> users;
+public class ClientProperties {
+    private List<Client> clients;
 
-    public List<User> getUsers() {
-        return users;
+    public List<Client> getClients() {
+        return clients;
     }
 
-    public void setUsers(List<User> users) {
-        this.users = users;
+    public void setClients(List<Client> clients) {
+        this.clients = clients;
     }
 
-    public static class User {
+    public static class Client {
         private String name;
         private String password;
+        private int accessTokenValiditySeconds;
+        private int refreshTokenValiditySeconds;
+        private List<String> grantTypes = new ArrayList<>();
         private List<String> authorities = new ArrayList<>();
+        private List<String> scopes = new ArrayList<>();
 
         public String getName() {
             return name;
@@ -64,6 +68,14 @@ public class UserProperties {
             this.password = password;
         }
 
+        public List<String> getGrantTypes() {
+            return grantTypes;
+        }
+
+        public void setGrantTypes(List<String> grantTypes) {
+            this.grantTypes = grantTypes;
+        }
+
         public List<GrantedAuthority> getAuthorities() {
             return authorities.stream()
                     .map(SimpleGrantedAuthority::new)
@@ -72,6 +84,30 @@ public class UserProperties {
 
         public void setAuthorities(List<String> authorities) {
             this.authorities = authorities;
+        }
+
+        public List<String> getScopes() {
+            return scopes;
+        }
+
+        public void setScopes(List<String> scopes) {
+            this.scopes = scopes;
+        }
+
+        public int getAccessTokenValiditySeconds() {
+            return accessTokenValiditySeconds;
+        }
+
+        public void setAccessTokenValiditySeconds(int accessTokenValiditySeconds) {
+            this.accessTokenValiditySeconds = accessTokenValiditySeconds;
+        }
+
+        public int getRefreshTokenValiditySeconds() {
+            return refreshTokenValiditySeconds;
+        }
+
+        public void setRefreshTokenValiditySeconds(int refreshTokenValiditySeconds) {
+            this.refreshTokenValiditySeconds = refreshTokenValiditySeconds;
         }
     }
 }

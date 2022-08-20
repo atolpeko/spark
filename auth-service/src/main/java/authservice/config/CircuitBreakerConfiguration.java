@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package authserver.config;
+package authservice.config;
 
 import io.github.resilience4j.circuitbreaker.CircuitBreaker;
 import io.github.resilience4j.circuitbreaker.CircuitBreakerConfig;

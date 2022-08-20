@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package authserver.service;
+package authservice.service;
 
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;

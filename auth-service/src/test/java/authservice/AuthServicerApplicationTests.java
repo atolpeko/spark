@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package authserver;
+package authservice;
 
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
@@ -23,7 +23,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 
 @Tag("category.IntegrationTest")
 @SpringBootTest
-public class AuthServerApplicationTests {
+public class AuthServicerApplicationTests {
 
 	@Test
 	public void contextLoads() {

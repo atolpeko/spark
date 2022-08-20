@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package authserver.service;
+package authservice.service;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;

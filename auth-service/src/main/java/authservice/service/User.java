@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package authserver.service;
+package authservice.service;
 
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;

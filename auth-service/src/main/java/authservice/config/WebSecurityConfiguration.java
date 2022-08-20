@@ -14,9 +14,9 @@
  * limitations under the License.
  */
 
-package authserver.config;
+package authservice.config;
 
-import authserver.config.properties.UserProperties;
+import authservice.config.properties.UserProperties;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;

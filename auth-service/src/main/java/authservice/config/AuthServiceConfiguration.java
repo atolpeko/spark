@@ -14,9 +14,9 @@
  * limitations under the License.
  */
 
-package authserver.config;
+package authservice.config;
 
-import authserver.config.properties.ClientProperties;
+import authservice.config.properties.ClientProperties;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -42,7 +42,7 @@ import java.util.Map;
 
 @Configuration
 @EnableAuthorizationServer
-public class AuthServerConfiguration extends AuthorizationServerConfigurerAdapter {
+public class AuthServiceConfiguration extends AuthorizationServerConfigurerAdapter {
     private final AuthenticationManager authenticationManager;
     private final PasswordEncoder passwordEncoder;
     private final ClientProperties clientProperties;
@@ -51,9 +51,9 @@ public class AuthServerConfiguration extends AuthorizationServerConfigurerAdapte
     private String jwtKey;
 
     @Autowired
-    public AuthServerConfiguration(AuthenticationManager authenticationManager,
-                                  PasswordEncoder encoder,
-                                  ClientProperties clientProperties) {
+    public AuthServiceConfiguration(AuthenticationManager authenticationManager,
+                                    PasswordEncoder encoder,
+                                    ClientProperties clientProperties) {
         this.authenticationManager = authenticationManager;
         this.passwordEncoder = encoder;
         this.clientProperties = clientProperties;
