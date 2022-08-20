@@ -22,7 +22,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 
 @Tag("category.IntegrationTest")
-@SpringBootTest(properties = "spring.cloud.config.enabled=false")
+@SpringBootTest
 public class AuthServerApplicationTests {
 
 	@Test

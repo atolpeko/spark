@@ -1,0 +1,37 @@
+server:
+  port: 9000
+h2:
+  console:
+    enabled: true
+  sql:
+    init:
+      platform: h2
+spring:
+  jpa:
+    show-sql: true
+    generate-ddl: true
+    hibernate:
+      ddl-auto: update
+    defer-datasource-initialization: true
+  datasource:
+    url: jdbc:h2:mem:testdb;DATABASE_TO_LOWER=TRUE;CASE_INSENSITIVE_IDENTIFIERS=TRUE
+    username: sa
+    password:
+    driverClassName: org.h2.Driver
+oauth:
+  jwt-key: debug-key
+  clients:
+    - name: debug-client
+      password:  debug-password
+      grantTypes:
+        - password
+      scopes:
+        - read
+        - write
+      accessTokenValiditySeconds: 1800
+      refreshTokenValiditySeconds: 43200
+  users:
+    - name: debug-admin
+      password: debug-password
+      authorities:
+        - ADMIN
