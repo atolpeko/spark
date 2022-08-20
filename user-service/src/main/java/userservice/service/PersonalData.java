@@ -30,7 +30,7 @@ import java.util.Objects;
 @Embeddable
 public class PersonalData {
 
-    @Column(nullable = false)
+    @Column(nullable = false, unique = true)
     @NotBlank(message = "Login is mandatory")
     private String login;
 
@@ -44,19 +44,7 @@ public class PersonalData {
 
     @Column(nullable = false)
     @NotNull(message = "Birthday is mandatory")
-    private LocalDate dateOfBirth;
-
-    @Column(nullable = false)
-    @NotNull(message = "Name showing property is mandatory")
-    private Boolean showName;
-
-    @Column(nullable = false)
-    @NotNull(message = "Phone showing property is mandatory")
-    private Boolean showPhone;
-
-    @Column(nullable = false)
-    @NotNull(message = "Birthday showing property is mandatory")
-    private Boolean showDateOfBirth;
+    private LocalDate birthday;
 
     /**
      * @return personal data builder
@@ -88,10 +76,7 @@ public class PersonalData {
         login = other.login;
         name = other.name;
         phone = other.phone;
-        dateOfBirth = other.dateOfBirth;
-        showName = other.showName;
-        showPhone = other.showPhone;
-        showDateOfBirth = other.showDateOfBirth;
+        birthday = other.birthday;
     }
 
     public String getLogin() {
@@ -118,36 +103,12 @@ public class PersonalData {
         this.phone = phone;
     }
 
-    public LocalDate getDateOfBirth() {
-        return dateOfBirth;
+    public LocalDate getBirthday() {
+        return birthday;
     }
 
-    public void setDateOfBirth(LocalDate dateOfBirth) {
-        this.dateOfBirth = dateOfBirth;
-    }
-
-    public Boolean showName() {
-        return showName;
-    }
-
-    public void showName(Boolean showName) {
-        this.showName = showName;
-    }
-
-    public Boolean showPhone() {
-        return showPhone;
-    }
-
-    public void showPhone(Boolean showPhone) {
-        this.showPhone = showPhone;
-    }
-
-    public Boolean showDateOfBirth() {
-        return showDateOfBirth;
-    }
-
-    public void showDateOfBirth(Boolean showDateOfBirth) {
-        this.showDateOfBirth = showDateOfBirth;
+    public void setBirthday(LocalDate dateOfBirth) {
+        this.birthday = dateOfBirth;
     }
 
     @Override
@@ -161,18 +122,15 @@ public class PersonalData {
         }
 
         PersonalData that = (PersonalData) other;
-        return showName == that.showName
-                && showPhone == that.showPhone
-                && showDateOfBirth == that.showDateOfBirth
-                && Objects.equals(login, that.login)
+        return Objects.equals(login, that.login)
                 && Objects.equals(name, that.name)
                 && Objects.equals(phone, that.phone)
-                && Objects.equals(dateOfBirth, that.dateOfBirth);
+                && Objects.equals(birthday, that.birthday);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(login, name, phone, dateOfBirth, showName, showPhone, showDateOfBirth);
+        return Objects.hash(login, name, phone, birthday);
     }
 
     @Override
@@ -181,10 +139,7 @@ public class PersonalData {
                 "login='" + login + '\'' +
                 ", name='" + name + '\'' +
                 ", phone='" + phone + '\'' +
-                ", dateOfBirth=" + dateOfBirth +
-                ", showName=" + showName +
-                ", showPhone=" + showPhone +
-                ", showDateOfBirth=" + showDateOfBirth +
+                ", birthday=" + birthday +
                 '}';
     }
 
@@ -215,23 +170,8 @@ public class PersonalData {
             return this;
         }
 
-        public Builder withDateOfBirth(LocalDate dateOfBirth) {
-            PersonalData.this.dateOfBirth = dateOfBirth;
-            return this;
-        }
-
-        public Builder showName(boolean showName) {
-            PersonalData.this.showName = showName;
-            return this;
-        }
-
-        public Builder showPhone(boolean showPhone) {
-            PersonalData.this.showPhone = showPhone;
-            return this;
-        }
-
-        public Builder showDateOfBirth(boolean showDateOfBirth) {
-            PersonalData.this.showDateOfBirth = showDateOfBirth;
+        public Builder withBirthday(LocalDate birthday) {
+            PersonalData.this.birthday = birthday;
             return this;
         }
 
@@ -252,17 +192,8 @@ public class PersonalData {
             if (other.phone != null) {
                 PersonalData.this.phone = other.phone;
             }
-            if (other.dateOfBirth != null) {
-                PersonalData.this.dateOfBirth = other.dateOfBirth;
-            }
-            if (other.showName != showPhone) {
-                PersonalData.this.showName = other.showName;
-            }
-            if (other.showPhone != null) {
-                PersonalData.this.showPhone = other.showDateOfBirth;
-            }
-            if (other.showDateOfBirth != null) {
-                PersonalData.this.showDateOfBirth = other.showDateOfBirth;
+            if (other.birthday != null) {
+                PersonalData.this.birthday = other.birthday;
             }
 
             return this;

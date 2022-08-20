@@ -43,10 +43,7 @@ public class PersonalDataTest {
                 .withLogin("Login")
                 .withName("Name")
                 .withPhone("011334400")
-                .withDateOfBirth(LocalDate.now())
-                .showName(true)
-                .showPhone(true)
-                .showDateOfBirth(true)
+                .withBirthday(LocalDate.now())
                 .build();
 
         int errors = validator.validate(data).size();

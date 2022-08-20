@@ -42,7 +42,7 @@ public class User {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(nullable = false)
+    @Column(nullable = false, unique = true)
     @NotBlank(message = "Email is mandatory")
     @Email(message = "Email should be valid")
     private String email;
@@ -51,7 +51,7 @@ public class User {
     @NotBlank(message = "Password is mandatory")
     private String password;
 
-    @Column(nullable = false)
+    @Column(name = "is_blocked", nullable = false)
     private Boolean isBlocked;
 
     @Embedded

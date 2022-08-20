@@ -86,10 +86,7 @@ public class UserServiceImplTest {
                 .withLogin("Login")
                 .withName("Name")
                 .withPhone("011334400")
-                .withDateOfBirth(LocalDate.now())
-                .showName(true)
-                .showPhone(true)
-                .showDateOfBirth(true)
+                .withBirthday(LocalDate.now())
                 .build();
 
         user = User.builder()
@@ -106,10 +103,7 @@ public class UserServiceImplTest {
                 .withLogin("Login2")
                 .withName("Name2")
                 .withPhone("114234400")
-                .withDateOfBirth(LocalDate.now())
-                .showName(false)
-                .showPhone(false)
-                .showDateOfBirth(false)
+                .withBirthday(LocalDate.now())
                 .build();
 
         updatedUser = User.builder()

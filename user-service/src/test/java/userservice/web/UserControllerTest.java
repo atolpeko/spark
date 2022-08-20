@@ -66,11 +66,8 @@ public class UserControllerTest {
                 "\"password\": \"123456789\"," +
                 "\"login\": \"login\"," +
                 "\"name\": \"Alexander\"," +
-                "\"dateOfBirth\": \"1995-01-22\"," +
-                "\"phone\": \"32343434\"," +
-                "\"showName\": \"false\"," +
-                "\"showPhone\": \"false\"," +
-                "\"showDateOfBirth\": \"false\"" +
+                "\"birthday\": \"1995-01-22\"," +
+                "\"phone\": \"32343434\"" +
                 "}";
     }
 
@@ -81,11 +78,8 @@ public class UserControllerTest {
                 "\"password\": \"987654321\"," +
                 "\"login\": \"login2\"," +
                 "\"name\": \"Mark\"," +
-                "\"dateOfBirth\": \"2003-07-24\"," +
-                "\"phone\": \"87637437984\"," +
-                "\"showName\": \"true\"," +
-                "\"showPhone\": \"true\"," +
-                "\"showDateOfBirth\": \"true\"" +
+                "\"birthday\": \"2003-07-24\"," +
+                "\"phone\": \"87637437984\"" +
                 "}";
     }
 
