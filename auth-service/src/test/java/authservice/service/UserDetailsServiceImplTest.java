@@ -61,8 +61,7 @@ public class UserDetailsServiceImplTest {
     @BeforeAll
     public static void createUser() {
         user = User.builder()
-                .withId(1L)
-                .withUsername("user@gmail.com")
+                .withLogin("user@gmail.com")
                 .withPassword("12345678")
                 .withRole(User.Role.USER)
                 .isBlocked(false)
@@ -77,8 +76,8 @@ public class UserDetailsServiceImplTest {
 
     @Test
     public void shouldReturnUserByUsernameWhenContainsIt() {
-        String username = user.getUsername();
-        when(userRepository.findByUsername(username)).thenReturn(Optional.of(user));
+        String username = user.getLogin();
+        when(userRepository.findById(username)).thenReturn(Optional.of(user));
 
         UserDetails saved = userDetailsService.loadUserByUsername(username);
         assertThat(saved, is(equalTo(user)));

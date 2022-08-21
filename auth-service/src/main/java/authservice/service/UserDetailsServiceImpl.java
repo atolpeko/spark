@@ -58,9 +58,8 @@ public class UserDetailsServiceImpl implements UserDetailsService {
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         try {
-            Supplier<Optional<User>> findUser = () -> userRepository.findByUsername(username);
-            UserDetails user = circuitBreaker.decorateSupplier(findUser).get().get();
-            return user;
+            Supplier<Optional<User>> findUser = () -> userRepository.findById(username);
+            return circuitBreaker.decorateSupplier(findUser).get().orElseThrow();
         } catch (NoSuchElementException e) {
             throw new UsernameNotFoundException("User not found: " + username, e);
         } catch (Exception e) {

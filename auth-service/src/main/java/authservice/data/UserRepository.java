@@ -21,20 +21,10 @@ import authservice.service.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
-import java.util.Optional;
-
 /**
  * UserRepository abstracts a collection of User objects.
  */
 @Repository
-public interface UserRepository extends JpaRepository<User, Long> {
+public interface UserRepository extends JpaRepository<User, String> {
 
-    /**
-     * Retrieves the user with the specified username.
-     *
-     * @param username username of the user to get
-     *
-     * @return a user with the specified username or Optional#empty() if none found
-     */
-    Optional<User> findByUsername(String username);
 }

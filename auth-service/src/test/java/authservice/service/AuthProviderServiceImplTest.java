@@ -61,8 +61,7 @@ public class AuthProviderServiceImplTest {
     @BeforeAll
     public static void createUser() {
         user = User.builder()
-                .withId(1L)
-                .withUsername("user@gmail.com")
+                .withLogin("user@gmail.com")
                 .withPassword("12345678")
                 .withRole(User.Role.USER)
                 .isBlocked(false)
@@ -77,9 +76,9 @@ public class AuthProviderServiceImplTest {
 
     @Test
     public void shouldAuthenticateUser() {
-        when(userDetailsService.loadUserByUsername(user.getUsername())).thenReturn(user);
+        when(userDetailsService.loadUserByUsername(user.getLogin())).thenReturn(user);
         Authentication userAuth = new UsernamePasswordAuthenticationToken(
-                user.getUsername(), user.getPassword(), user.getAuthorities()
+                user.getLogin(), user.getPassword(), user.getAuthorities()
         );
         userAuth.setAuthenticated(false);
 

@@ -24,8 +24,6 @@ import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Table;
 
@@ -46,11 +44,7 @@ public class User implements UserDetails {
     public enum Role { USER, ADMIN }
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
-
-    @Column(name = "email", nullable = false, unique = true)
-    private String username;
+    private String login;
 
     @Column(nullable = false)
     private String password;
@@ -84,8 +78,7 @@ public class User implements UserDetails {
     }
 
     public User(User other) {
-        id = other.id;
-        username = other.username;
+        login = other.login;
         password = other.password;
         isBlocked = other.isBlocked;
         role = other.role;
@@ -104,7 +97,11 @@ public class User implements UserDetails {
 
     @Override
     public String getUsername() {
-        return username;
+        return login;
+    }
+
+    public String getLogin() {
+        return login;
     }
 
     @Override
@@ -127,16 +124,8 @@ public class User implements UserDetails {
         return !isBlocked;
     }
 
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public void setUsername(String username) {
-        this.username = username;
+    public void setLogin(String username) {
+        this.login = username;
     }
 
     public void setPassword(String password) {
@@ -170,7 +159,7 @@ public class User implements UserDetails {
         }
 
         User user = (User) other;
-        return Objects.equals(username, user.username)
+        return Objects.equals(login, user.login)
                 && Objects.equals(password, user.password)
                 && Objects.equals(isBlocked, user.isBlocked)
                 && role == user.role;
@@ -178,14 +167,13 @@ public class User implements UserDetails {
 
     @Override
     public int hashCode() {
-        return Objects.hash(username, password, role, isBlocked);
+        return Objects.hash(login, password, role, isBlocked);
     }
 
     @Override
     public String toString() {
         return getClass().getName() + "{" +
-                "id=" + id +
-                ", username='" + username + '\'' +
+                "login='" + login + '\'' +
                 ", password='" + password + '\'' +
                 ", role=" + role +
                 ", isBlocked=" + isBlocked +
@@ -204,13 +192,8 @@ public class User implements UserDetails {
             return User.this;
         }
 
-        public Builder withId(Long id) {
-            User.this.id = id;
-            return this;
-        }
-
-        public Builder withUsername(String username) {
-            User.this.username = username;
+        public Builder withLogin(String login) {
+            User.this.login = login;
             return this;
         }
 
