@@ -1,0 +1,9 @@
+server:
+  port: 32768
+spring:
+  jpa:
+    database: MYSQL
+    hibernate:
+      ddl-auto: update
+  datasource:
+    driverClassName: com.mysql.cj.jdbc.Driver
