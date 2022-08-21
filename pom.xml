@@ -16,6 +16,7 @@
 
     <modules>
         <module>user-service</module>
+        <module>community-service</module>
         <module>auth-service</module>
     </modules>
 
