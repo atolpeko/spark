@@ -65,6 +65,6 @@ public class UserTest {
                 .build();
 
         int errors = validator.validate(user).size();
-        assertThat(errors, is(9));
+        assertThat(errors, is(6));
     }
 }

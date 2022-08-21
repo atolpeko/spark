@@ -55,6 +55,6 @@ public class PersonalDataTest {
         PersonalData data = PersonalData.builder().build();
 
         int errors = validator.validate(data).size();
-        assertThat(errors, is(7));
+        assertThat(errors, is(4));
     }
 }
