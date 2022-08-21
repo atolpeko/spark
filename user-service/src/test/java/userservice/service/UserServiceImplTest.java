@@ -83,15 +83,14 @@ public class UserServiceImplTest {
     @BeforeAll
     public static void createUser() {
         PersonalData data = PersonalData.builder()
-                .withLogin("Login")
+                .withEmail("user@gmail.com")
                 .withName("Name")
                 .withPhone("011334400")
                 .withBirthday(LocalDate.now())
                 .build();
 
         user = User.builder()
-                .withId(1L)
-                .withEmail("user@gmail.com")
+                .withLogin("login")
                 .withPassword("password")
                 .withPersonalData(data)
                 .build();
@@ -100,15 +99,14 @@ public class UserServiceImplTest {
     @BeforeAll
     public static void createUpdatedUser() {
         PersonalData data = PersonalData.builder()
-                .withLogin("Login2")
+                .withEmail("email2@gmail.com")
                 .withName("Name2")
                 .withPhone("114234400")
                 .withBirthday(LocalDate.now())
                 .build();
 
         updatedUser = User.builder()
-                .withId(1L)
-                .withEmail("user2@gmail.com")
+                .withLogin("login")
                 .withPassword("password2")
                 .withPersonalData(data)
                 .isBlocked(true)
@@ -122,26 +120,18 @@ public class UserServiceImplTest {
     }
 
     @Test
-    public void shouldReturnUserByIdWhenContainsIt() {
-        when(userRepository.findById(1L)).thenReturn(Optional.of(user));
+    public void shouldReturnUserByLoginWhenContainsIt() {
+        when(userRepository.findById(user.getLogin())).thenReturn(Optional.of(user));
 
-        User saved = userService.findById(1).orElseThrow();
+        User saved = userService.findByLogin(user.getLogin()).orElseThrow();
         assertThat(saved, is(equalTo(user)));
     }
 
     @Test
     public void shouldReturnUserByEmailWhenContainsIt() {
-        when(userRepository.findByEmail(user.getEmail())).thenReturn(Optional.of(user));
+        when(userRepository.findByEmail(user.getPersonalData().getEmail())).thenReturn(Optional.of(user));
 
-        User saved = userService.findByEmail(user.getEmail()).orElseThrow();
-        assertThat(saved, is(equalTo(user)));
-    }
-
-    @Test
-    public void shouldReturnUserByLoginWhenContainsIt() {
-        when(userRepository.findByLogin(user.getPersonalData().getLogin())).thenReturn(Optional.of(user));
-
-        User saved = userService.findByLogin(user.getPersonalData().getLogin()).orElseThrow();
+        User saved = userService.findByEmail(user.getPersonalData().getEmail()).orElseThrow();
         assertThat(saved, is(equalTo(user)));
     }
 
@@ -179,7 +169,7 @@ public class UserServiceImplTest {
 
     @Test
     public void shouldUpdateUserWhenUserIsValid() {
-        when(userRepository.findById(1L)).thenReturn(Optional.of(user));
+        when(userRepository.findById("login")).thenReturn(Optional.of(user));
         when(userRepository.save(any(User.class))).thenReturn(updatedUser);
         when(validator.validate(any(User.class))).thenReturn(Collections.emptySet());
 
@@ -189,13 +179,13 @@ public class UserServiceImplTest {
 
     @Test
     public void shouldNotContainUserWhenDeletesThisUser() {
-        when(userRepository.findById(any(Long.class))).thenReturn(Optional.of(user));
-        doAnswer(invocation -> when(userRepository.findById(1L)).thenReturn(Optional.empty()))
-                .when(userRepository).deleteById(1L);
+        when(userRepository.findById(any(String.class))).thenReturn(Optional.of(user));
+        doAnswer(invocation -> when(userRepository.findById("login")).thenReturn(Optional.empty()))
+                .when(userRepository).deleteById("login");
 
-        userService.deleteById(1);
+        userService.deleteByLogin("login");
 
-        Optional<User> deleted = userService.findById(1);
+        Optional<User> deleted = userService.findByLogin("login");
         assertThat(deleted, is(Optional.empty()));
     }
 }

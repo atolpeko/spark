@@ -34,9 +34,9 @@ public class UserModelAssembler implements RepresentationModelAssembler<User, En
 
     @Override
     public EntityModel<User> toModel(User entity) {
-        long id = entity.getId();
+        String login = entity.getLogin();
         return EntityModel.of(entity,
-                linkTo(methodOn(UserController.class).getById(id)).withSelfRel(),
+                linkTo(methodOn(UserController.class).getByLogin(login)).withSelfRel(),
                 linkTo(methodOn(UserController.class).getAll()).withRel("all"));
     }
 

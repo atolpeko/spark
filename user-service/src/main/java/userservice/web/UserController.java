@@ -61,29 +61,20 @@ public class UserController {
         return modelAssembler.toCollectionModel(users);
     }
 
-    @GetMapping("/{id}")
-    @PostAuthorize("hasAuthority('USER') and returnObject.content.email == authentication.name " +
-            "or hasAuthority('ADMIN')")
-    public EntityModel<User> getById(@PathVariable Long id) {
-        User user = userService.findById(id)
-                .orElseThrow(() -> new  NoSuchElementException("No user with id " + id));
+    @GetMapping(params = "login")
+    @PreAuthorize("hasAuthority('USER') and #login == authentication.name or hasAuthority('ADMIN')")
+    public EntityModel<User> getByLogin(@RequestParam String login) {
+        User user = userService.findByLogin(login)
+                .orElseThrow(() -> new  NoSuchElementException("No user with login " + login));
         return modelAssembler.toModel(user);
     }
 
     @GetMapping(params = "email")
-    @PreAuthorize("hasAuthority('USER') and #email == authentication.name or hasAuthority('ADMIN')")
+    @PostAuthorize("hasAuthority('USER') and returnObject.content.login == authentication.name" +
+            " or hasAuthority('ADMIN')")
     public EntityModel<User> getByEmail(@RequestParam String email) {
         User user = userService.findByEmail(email)
                 .orElseThrow(() -> new  NoSuchElementException("No user with email " + email));
-        return modelAssembler.toModel(user);
-    }
-
-    @GetMapping(params = "login")
-    @PostAuthorize("hasAuthority('USER') and returnObject.content.email == authentication.name " +
-            "or hasAuthority('ADMIN')")
-    public EntityModel<User> getByLogin(@RequestParam String login) {
-        User user = userService.findByLogin(login)
-                .orElseThrow(() -> new  NoSuchElementException("No user with login " + login));
         return modelAssembler.toModel(user);
     }
 
@@ -94,26 +85,26 @@ public class UserController {
         return modelAssembler.toModel(saved);
     }
 
-    @PatchMapping("/{id}")
-    @PreAuthorize("@userAccessHandler.canPatch(#id)")
-    public EntityModel<User> patchById(@PathVariable Long id,
-                                       @RequestBody User user) {
-        user.setId(id);
+    @PatchMapping("/{login}")
+    @PreAuthorize("hasAuthority('USER') and #login == authentication.name or hasAuthority('ADMIN')")
+    public EntityModel<User> patchByLogin(@PathVariable String login,
+                                          @RequestBody User user) {
+        user.setLogin(login);
         User updated = userService.update(user);
         return modelAssembler.toModel(updated);
     }
 
-    @PatchMapping(value = "/{id}", params = "isBlocked")
+    @PatchMapping(value = "/{login}", params = "isBlocked")
     @PreAuthorize("hasAuthority('ADMIN')")
-    public void blockById(@PathVariable Long id,
-                          @RequestParam Boolean isBlocked) {
-        userService.setBlockedById(id, isBlocked);
+    public void blockByLogin(@PathVariable String login,
+                             @RequestParam Boolean isBlocked) {
+        userService.setBlockedByLogin(login, isBlocked);
     }
 
-    @DeleteMapping("{id}")
+    @DeleteMapping("{login}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    @PreAuthorize("@userAccessHandler.canDelete(#id)")
-    public void deleteById(@PathVariable Long id) {
-        userService.deleteById(id);
+    @PreAuthorize("hasAuthority('USER') and #login == authentication.name or hasAuthority('ADMIN')")
+    public void deleteByLogin(@PathVariable String login) {
+        userService.deleteByLogin(login);
     }
 }

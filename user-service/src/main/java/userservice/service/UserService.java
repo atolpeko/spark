@@ -37,16 +37,16 @@ public interface UserService {
     List<User> findAll();
 
     /**
-     * Looks for a user with the specified ID in the remote user repository.
+     * Looks for a user with the specified login in the remote user repository.
      *
-     * @param id ID of the user to get
+     * @param login login of the user to get
      *
-     * @return the user with the specified ID in the remote user repository
+     * @return the user with the specified login in the remote user repository
      * or Optional#empty() if none found
      *
      * @throws RemoteResourceException if there is any problem with the remote user repository
      */
-    Optional<User> findById(long id);
+    Optional<User> findByLogin(String login);
 
     /**
      * Looks for a user with the specified email in the remote user repository.
@@ -59,18 +59,6 @@ public interface UserService {
      * @throws RemoteResourceException if there is any problem with the remote user repository
      */
     Optional<User> findByEmail(String email);
-
-    /**
-     * Looks for a user with the specified login in the remote user repository.
-     *
-     * @param login login of the user to get
-     *
-     * @return the user with the specified login in the remote user repository
-     * or Optional#empty() if none found
-     *
-     * @throws RemoteResourceException if there is any problem with the remote user repository
-     */
-    Optional<User> findByLogin(String login);
 
     /**
      * Counts the number of user in the remote user repository.
@@ -96,7 +84,7 @@ public interface UserService {
     User save(User user);
 
     /**
-     * Updates the user with the specified ID in the remote user repository.
+     * Updates the user with the specified login in the remote user repository.
      * Use the returned user for further operations as the update operation
      * might have changed the user instance completely.
      *
@@ -110,22 +98,22 @@ public interface UserService {
     User update(User user);
 
     /**
-     * Blocks or unblocks the user with the specified ID in the remote user repository.
+     * Blocks or unblocks the user with the specified login in the remote user repository.
      *
-     * @param id the ID of the user to be blocked / unblocked
+     * @param login the login of the user to be blocked / unblocked
      *
      * @throws IllegalModificationException if such a user does not exist
      * @throws RemoteResourceException if there is any problem with the remote user repository
      */
-    void setBlockedById(long id, boolean isBlocked);
+    void setBlockedByLogin(String login, boolean isBlocked);
 
     /**
-     * Deletes the user with the specified ID in the remote user repository.
+     * Deletes the user with the specified login in the remote user repository.
      *
-     * @param id the ID of the user to be deleted
+     * @param login the login of the user to be deleted
      *
      * @throws IllegalModificationException if such a user does not exist
      * @throws RemoteResourceException if there is any problem with the remote user repository
      */
-    void deleteById(long id);
+    void deleteByLogin(String login);
 }

@@ -28,7 +28,7 @@ import java.util.Optional;
  * A UserRepository abstracts a collection of User objects.
  */
 @Repository
-public interface UserRepository extends JpaRepository<User, Long> {
+public interface UserRepository extends JpaRepository<User, String> {
 
     /**
      * Retrieves a user by its email.
@@ -37,15 +37,6 @@ public interface UserRepository extends JpaRepository<User, Long> {
      *
      * @return the user with the given email or Optional#empty() if none found.
      */
+    @Query("FROM User WHERE personalData.email=?1")
     Optional<User> findByEmail(String email);
-
-    /**
-     * Retrieves a user by its login.
-     *
-     * @param login login of the user to get
-     *
-     * @return the user with the given login or Optional#empty() if none found.
-     */
-    @Query("FROM User WHERE personalData.login=?1")
-    Optional<User> findByLogin(String login);
 }

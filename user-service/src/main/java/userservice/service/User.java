@@ -21,12 +21,9 @@ import com.fasterxml.jackson.annotation.JsonUnwrapped;
 import javax.persistence.Column;
 import javax.persistence.Embedded;
 import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Table;
 import javax.validation.Valid;
-import javax.validation.constraints.Email;
 import javax.validation.constraints.NotBlank;
 
 import java.util.Objects;
@@ -39,13 +36,8 @@ import java.util.Objects;
 public class User {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
-
-    @Column(nullable = false, unique = true)
-    @NotBlank(message = "Email is mandatory")
-    @Email(message = "Email should be valid")
-    private String email;
+    @NotBlank(message = "Login is mandatory")
+    private String login;
 
     @Column(nullable = false)
     @NotBlank(message = "Password is mandatory")
@@ -82,27 +74,18 @@ public class User {
     }
 
     public User(User other) {
-        id = other.id;
-        email = other.email;
+        login = other.login;
         password = other.password;
         isBlocked = other.isBlocked;
         personalData = other.personalData;
     }
 
-    public Long getId() {
-        return id;
+    public String getLogin() {
+        return login;
     }
 
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public String getEmail() {
-        return email;
-    }
-
-    public void setEmail(String email) {
-        this.email = email;
+    public void setLogin(String login) {
+        this.login = login;
     }
 
     public String getPassword() {
@@ -140,7 +123,7 @@ public class User {
         }
 
         User user = (User) other;
-        return Objects.equals(email, user.email)
+        return Objects.equals(login, user.login)
                 && Objects.equals(password, user.password)
                 && Objects.equals(isBlocked, user.isBlocked)
                 && Objects.equals(personalData, user.personalData);
@@ -148,14 +131,13 @@ public class User {
 
     @Override
     public int hashCode() {
-        return Objects.hash(email, password, isBlocked, personalData);
+        return Objects.hash(login, password, isBlocked, personalData);
     }
 
     @Override
     public String toString() {
         return getClass().getName() + "{" +
-                "id=" + id +
-                ", email='" + email + '\'' +
+                "login='" + login + '\'' +
                 ", password='" + password + '\'' +
                 ", isBlocked=" + isBlocked +
                 ", personalData=" + personalData +
@@ -174,13 +156,8 @@ public class User {
             return User.this;
         }
 
-        public Builder withId(Long id) {
-            User.this.id = id;
-            return this;
-        }
-
-        public Builder withEmail(String email) {
-            User.this.email = email;
+        public Builder withLogin(String login) {
+            User.this.login = login;
             return this;
         }
 
@@ -207,11 +184,8 @@ public class User {
          * @return this builder
          */
         public Builder copyNonNullFields(User other) {
-            if (other.id != null) {
-                User.this.id = other.id;
-            }
-            if (other.email != null) {
-                User.this.email = other.email;
+            if (other.login != null) {
+                User.this.login = other.login;
             }
             if (other.password != null) {
                 User.this.password = other.password;
@@ -220,7 +194,9 @@ public class User {
                 User.this.isBlocked = other.isBlocked;
             }
             if (other.personalData != null) {
-                User.this.personalData = other.personalData;
+                User.this.personalData = PersonalData.builder(User.this.personalData)
+                        .copyNonNullFields(other.personalData)
+                        .build();
             }
 
             return this;

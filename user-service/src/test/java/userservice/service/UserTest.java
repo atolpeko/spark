@@ -40,14 +40,14 @@ public class UserTest {
     @Test
     public void shouldPassValidationWhenHasValidData() {
         PersonalData data = PersonalData.builder()
-                .withLogin("Login")
+                .withEmail("email@gmail.com")
                 .withName("Name")
                 .withPhone("011334400")
                 .withBirthday(LocalDate.now())
                 .build();
 
         User user = User.builder()
-                .withEmail("user@gmail.com")
+                .withLogin("login")
                 .withPassword("password")
                 .withPersonalData(data)
                 .build();
@@ -58,10 +58,11 @@ public class UserTest {
 
     @Test
     public void shouldNotPassValidationWhenHasInvalidData() {
-        PersonalData data = PersonalData.builder().build();
+        PersonalData data = PersonalData.builder()
+                .withEmail("not-an-email")
+                .build();
         User user = User.builder()
                 .withPersonalData(data)
-                .withEmail("email")
                 .build();
 
         int errors = validator.validate(user).size();

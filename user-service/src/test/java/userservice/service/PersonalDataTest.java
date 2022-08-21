@@ -40,7 +40,7 @@ public class PersonalDataTest {
     @Test
     public void shouldPassValidationWhenHasValidData() {
         PersonalData data = PersonalData.builder()
-                .withLogin("Login")
+                .withEmail("email@gmail.com")
                 .withName("Name")
                 .withPhone("011334400")
                 .withBirthday(LocalDate.now())
@@ -52,7 +52,9 @@ public class PersonalDataTest {
 
     @Test
     public void shouldNotPassValidationWhenHasInvalidData() {
-        PersonalData data = PersonalData.builder().build();
+        PersonalData data = PersonalData.builder()
+                .withEmail("not-an-email")
+                .build();
 
         int errors = validator.validate(data).size();
         assertThat(errors, is(4));

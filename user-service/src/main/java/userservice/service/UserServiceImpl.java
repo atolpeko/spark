@@ -73,16 +73,6 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public Optional<User> findById(long id) {
-        try {
-            Supplier<Optional<User>> findById = () -> repository.findById(id);
-            return circuitBreaker.decorateSupplier(findById).get();
-        } catch (Exception e) {
-            throw new RemoteResourceException("User database unavailable", e);
-        }
-    }
-
-    @Override
     public Optional<User> findByEmail(String email) {
         try {
             Supplier<Optional<User>> findByEmail = () -> repository.findByEmail(email);
@@ -95,7 +85,7 @@ public class UserServiceImpl implements UserService {
     @Override
     public Optional<User> findByLogin(String login) {
         try {
-            Supplier<Optional<User>> findByLogin = () -> repository.findByLogin(login);
+            Supplier<Optional<User>> findByLogin = () -> repository.findById(login);
             return circuitBreaker.decorateSupplier(findByLogin).get();
         } catch (Exception e) {
             throw new RemoteResourceException("User database unavailable", e);
@@ -118,12 +108,12 @@ public class UserServiceImpl implements UserService {
             validate(user);
             User userToSave = prepareSaveData(user);
             User saved = persistUser(userToSave);
-            logger.info("User " + saved.getEmail() + " saved. ID - " + saved.getId());
+            logger.info("User " + saved.getLogin() + " saved");
             return saved;
         } catch (IllegalModificationException | RemoteResourceException e) {
             throw e;
         } catch (DataIntegrityViolationException e) {
-            String msg = "Such a user already exists: " + user.getEmail();
+            String msg = "Such a user already exists: " + user.getLogin();
             throw new IllegalModificationException(msg, e);
         } catch (Exception e) {
             throw new RemoteResourceException("User database unavailable", e);
@@ -147,7 +137,6 @@ public class UserServiceImpl implements UserService {
     private User prepareSaveData(User user) {
         String password = passwordEncoder.encode(user.getPassword());
         User userToSave = new User(user);
-        userToSave.setId(null);
         userToSave.setPassword(password);
 
         return userToSave;
@@ -166,19 +155,19 @@ public class UserServiceImpl implements UserService {
     @Override
     public User update(User user) {
         try {
-            long id = user.getId();
-            User userToUpdate = findById(id)
-                    .orElseThrow(() -> new IllegalModificationException("No user with id " + id));
+            String login = user.getLogin();
+            User userToUpdate = findByLogin(login)
+                    .orElseThrow(() -> new IllegalModificationException("No user with login " + login));
             userToUpdate = prepareUpdateData(userToUpdate, user);
             validate(userToUpdate);
 
             User updated = persistUser(userToUpdate);
-            logger.info("User " + updated.getId() + " updated");
+            logger.info("User " + updated.getLogin() + " updated");
             return updated;
         } catch (IllegalModificationException | RemoteResourceException e) {
             throw e;
         } catch (DataIntegrityViolationException e) {
-            String msg = "Such a user already exists: " + user.getEmail();
+            String msg = "Such a user already exists: " + user.getLogin();
             throw new IllegalModificationException(msg, e);
         } catch (Exception e) {
             throw new RemoteResourceException("User database unavailable", e);
@@ -192,13 +181,13 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public void setBlockedById(long id, boolean isBlocked) {
+    public void setBlockedByLogin(String login, boolean isBlocked) {
         try {
-            User userToUpdate = findById(id)
-                    .orElseThrow(() -> new IllegalModificationException("No user with id " + id));
+            User userToUpdate = findByLogin(login)
+                    .orElseThrow(() -> new IllegalModificationException("No user with login " + login));
             userToUpdate.setBlocked(isBlocked);
             persistUser(userToUpdate);
-            logger.info("User " + id + (isBlocked ? " blocked" : " unblocked"));
+            logger.info("User " + login + (isBlocked ? " blocked" : " unblocked"));
         } catch (IllegalModificationException | RemoteResourceException e) {
             throw e;
         } catch (Exception e) {
@@ -207,20 +196,20 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public void deleteById(long id) {
+    public void deleteByLogin(String login) {
         try {
-            deleteUser(id);
-            logger.info("User " + id + " deleted");
+            deleteUser(login);
+            logger.info("User " + login + " deleted");
         } catch (EmptyResultDataAccessException e) {
-            throw new IllegalModificationException("No user with id " + id, e);
+            throw new IllegalModificationException("No user with login " + login, e);
         } catch (Exception e) {
             throw new RemoteResourceException("User database unavailable", e);
         }
     }
 
-    private void deleteUser(long id) {
+    private void deleteUser(String login) {
         Runnable delete = () -> {
-            repository.deleteById(id);
+            repository.deleteById(login);
             repository.flush();
         };
 

@@ -18,6 +18,7 @@ package userservice.service;
 
 import javax.persistence.Column;
 import javax.persistence.Embeddable;
+import javax.validation.constraints.Email;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 
@@ -31,8 +32,9 @@ import java.util.Objects;
 public class PersonalData {
 
     @Column(nullable = false, unique = true)
-    @NotBlank(message = "Login is mandatory")
-    private String login;
+    @NotBlank(message = "Email is mandatory")
+    @Email(message = "Email should be valid")
+    private String email;
 
     @Column(nullable = false)
     @NotBlank(message = "Name is mandatory")
@@ -73,18 +75,18 @@ public class PersonalData {
      * @param other personal data to copy data from
      */
     public PersonalData(PersonalData other) {
-        login = other.login;
+        email = other.email;
         name = other.name;
         phone = other.phone;
         birthday = other.birthday;
     }
 
-    public String getLogin() {
-        return login;
+    public String getEmail() {
+        return email;
     }
 
-    public void setLogin(String login) {
-        this.login = login;
+    public void setEmail(String email) {
+        this.email = email;
     }
 
     public String getName() {
@@ -122,7 +124,7 @@ public class PersonalData {
         }
 
         PersonalData that = (PersonalData) other;
-        return Objects.equals(login, that.login)
+        return Objects.equals(email, that.email)
                 && Objects.equals(name, that.name)
                 && Objects.equals(phone, that.phone)
                 && Objects.equals(birthday, that.birthday);
@@ -130,13 +132,13 @@ public class PersonalData {
 
     @Override
     public int hashCode() {
-        return Objects.hash(login, name, phone, birthday);
+        return Objects.hash(email, name, phone, birthday);
     }
 
     @Override
     public String toString() {
         return getClass().getName() + "{" +
-                "login='" + login + '\'' +
+                "email='" + email + '\'' +
                 ", name='" + name + '\'' +
                 ", phone='" + phone + '\'' +
                 ", birthday=" + birthday +
@@ -155,8 +157,8 @@ public class PersonalData {
             return PersonalData.this;
         }
 
-        public Builder withLogin(String login) {
-            PersonalData.this.login = login;
+        public Builder withEmail(String email) {
+            PersonalData.this.email = email;
             return this;
         }
 
@@ -183,8 +185,8 @@ public class PersonalData {
          * @return this builder
          */
         public Builder copyNonNullFields(PersonalData other) {
-            if (other.login != null) {
-                PersonalData.this.login = other.login;
+            if (other.email != null) {
+                PersonalData.this.email = other.email;
             }
             if (other.name != null) {
                 PersonalData.this.name = other.name;

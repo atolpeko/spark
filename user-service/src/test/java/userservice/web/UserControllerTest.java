@@ -64,6 +64,7 @@ public class UserControllerTest {
     @BeforeAll
     public static void createNewUserJson() {
         newUserJson = "{" +
+                "\"login\": \"new-login\"," +
                 "\"email\": \"email@gmail.com\"," +
                 "\"password\": \"123456789\"," +
                 "\"login\": \"login\"," +
@@ -76,6 +77,7 @@ public class UserControllerTest {
     @BeforeAll
     private static void createUpdatedUserJsons() {
         updatedUser1Json = "{" +
+                "\"login\": \"new-login2\"," +
                 "\"password\": \"987654321\"," +
                 "\"login\": \"login1\"," +
                 "\"name\": \"Mark\"," +
@@ -84,6 +86,7 @@ public class UserControllerTest {
                 "}";
 
         updatedUser2Json = "{" +
+                "\"login\": \"new-login3\"," +
                 "\"password\": \"fkm4454\"," +
                 "\"login\": \"login2\"," +
                 "\"name\": \"Mark\"," +
@@ -119,33 +122,33 @@ public class UserControllerTest {
 
     @Test
     @WithMockUser(authorities = "ADMIN")
-    public void shouldReturnUserOnUsersGetByIdRequestWhenUserIsAdmin() throws Exception {
-        getByIdAndExpect(status().isOk());
+    public void shouldReturnUserOnUserGetByLoginRequestWhenUserIsAdmin() throws Exception {
+        getByLoginAndExpect(status().isOk());
     }
 
-    private void getByIdAndExpect(ResultMatcher status) throws Exception {
-        mvc.perform(get("/users/1"))
+    private void getByLoginAndExpect(ResultMatcher status) throws Exception {
+        mvc.perform(get("/users").param("login", "log"))
                 .andDo(print())
                 .andExpect(status)
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON));
     }
 
     @Test
-    @WithMockUser(username = "e@gmail.com", authorities = "USER")
-    public void shouldReturnUserOnUsersGetByIdRequestWhenUserIsResourceOwner() throws Exception {
-        getByIdAndExpect(status().isOk());
+    @WithMockUser(username = "log", authorities = "USER")
+    public void shouldReturnUserOnUsersGetByLoginRequestWhenUserIsResourceOwner() throws Exception {
+        getByLoginAndExpect(status().isOk());
     }
 
     @Test
-    @WithMockUser(username = "e2@gmail.com", authorities = "USER")
-    public void shouldDenyAccessToUserByIdWhenUserIsNotResourceOwner() throws Exception {
-        getByIdAndExpect(status().isUnauthorized());
+    @WithMockUser(username = "log2", authorities = "USER")
+    public void shouldDenyAccessToUserByLoginWhenUserIsNotResourceOwner() throws Exception {
+        getByLoginAndExpect(status().isUnauthorized());
     }
 
     @Test
     @WithAnonymousUser
-    public void shouldDenyAccessToUserByIdWhenUserIsNotAuthenticated() throws Exception {
-        getByIdAndExpect(status().isUnauthorized());
+    public void shouldDenyAccessToUserByLoginWhenUserIsNotAuthenticated() throws Exception {
+        getByLoginAndExpect(status().isUnauthorized());
     }
 
     @Test
@@ -162,13 +165,13 @@ public class UserControllerTest {
     }
 
     @Test
-    @WithMockUser(username = "e@gmail.com", authorities = "USER")
+    @WithMockUser(username = "log", authorities = "USER")
     public void shouldReturnUserOnUsersGetByEmailRequestWhenUserIsResourceOwner() throws Exception {
         getByEmailAndExpect(status().isOk());
     }
 
     @Test
-    @WithMockUser(username = "e2@gmail.com", authorities = "USER")
+    @WithMockUser(username = "log2", authorities = "USER")
     public void shouldDenyAccessToUserByEmailWhenUserIsNotResourceOwner() throws Exception {
         getByEmailAndExpect(status().isUnauthorized());
     }
@@ -177,37 +180,6 @@ public class UserControllerTest {
     @WithAnonymousUser
     public void shouldDenyAccessToUserByEmailWhenUserIsNotAuthenticated() throws Exception {
         getByEmailAndExpect(status().isUnauthorized());
-    }
-
-    @Test
-    @WithMockUser(authorities = "ADMIN")
-    public void shouldReturnUserOnUserGetByLoginRequestWhenUserIsAdmin() throws Exception {
-        getByLoginAndExpect(status().isOk());
-    }
-
-    private void getByLoginAndExpect(ResultMatcher status) throws Exception {
-        mvc.perform(get("/users").param("login", "log"))
-                .andDo(print())
-                .andExpect(status)
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON));
-    }
-
-    @Test
-    @WithMockUser(username = "e@gmail.com", authorities = "USER")
-    public void shouldReturnUserOnUsersGetByLoginRequestWhenUserIsResourceOwner() throws Exception {
-        getByLoginAndExpect(status().isOk());
-    }
-
-    @Test
-    @WithMockUser(username = "e2@gmail.com", authorities = "USER")
-    public void shouldDenyAccessToUserByLoginWhenUserIsNotResourceOwner() throws Exception {
-        getByLoginAndExpect(status().isUnauthorized());
-    }
-
-    @Test
-    @WithAnonymousUser
-    public void shouldDenyAccessToUserByLoginWhenUserIsNotAuthenticated() throws Exception {
-        getByLoginAndExpect(status().isUnauthorized());
     }
 
     @Test
@@ -232,15 +204,15 @@ public class UserControllerTest {
     @Test
     @WithMockUser(authorities = "ADMIN")
     public void shouldReturnUpdatedUserOnUsersPatchRequestWhenUserIsAdmin() throws Exception {
-        User initial = userService.findById(2).orElseThrow();
-        patchByIdAndExpect(2, updatedUser1Json, status().isOk());
+        User initial = userService.findByLogin("log2").orElseThrow();
+        patchByLoginAndExpect("log2", updatedUser1Json, status().isOk());
 
-        User updated = userService.findById(2).orElseThrow();
+        User updated = userService.findByLogin("log2").orElseThrow();
         assertThat(updated, is(not(equalTo(initial))));
     }
 
-    private void patchByIdAndExpect(long id, String data, ResultMatcher status) throws Exception {
-        mvc.perform(patch("/users/" + id)
+    private void patchByLoginAndExpect(String login, String data, ResultMatcher status) throws Exception {
+        mvc.perform(patch("/users/" + login)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(data)
                         .accept(MediaType.APPLICATION_JSON))
@@ -250,39 +222,39 @@ public class UserControllerTest {
     }
 
     @Test
-    @WithMockUser(username = "e3@gmail.com", authorities = "USER")
+    @WithMockUser(username = "log3", authorities = "USER")
     public void shouldReturnUpdatedUserOnUsersPatchRequestWhenUserIsResourceOwner() throws Exception {
-        User initial = userService.findById(3).orElseThrow();
-        patchByIdAndExpect(3, updatedUser2Json, status().isOk());
+        User initial = userService.findByLogin("log3").orElseThrow();
+        patchByLoginAndExpect("log3", updatedUser2Json, status().isOk());
 
-        User updated = userService.findById(3).orElseThrow();
+        User updated = userService.findByLogin("log3").orElseThrow();
         assertThat(updated, is(not(equalTo(initial))));
     }
 
     @Test
-    @WithMockUser(username = "e3@gmail.com", authorities = "USER")
+    @WithMockUser(username = "log4", authorities = "USER")
     public void shouldDenyUserPatchingWhenUserIsNotResourceOwner() throws Exception {
-        patchByIdAndExpect(2, updatedUser1Json, status().isUnauthorized());
+        patchByLoginAndExpect("log2", updatedUser1Json, status().isUnauthorized());
     }
 
     @Test
     @WithAnonymousUser
     public void shouldDenyUserPatchingWhenUserIsNotAuthenticated() throws Exception {
-        patchByIdAndExpect(2, updatedUser1Json, status().isUnauthorized());
+        patchByLoginAndExpect("log2", updatedUser1Json, status().isUnauthorized());
     }
 
     @Test
     @WithMockUser(authorities = "ADMIN")
     public void shouldBlockUserOnUserBlockRequestWhenUserIsAdmin() throws Exception {
-        User initial = userService.findById(6).orElseThrow();
-        blockByIdAndExpect(6, status().isOk());
+        User initial = userService.findByLogin("log6").orElseThrow();
+        blockByLoginAndExpect("log6", status().isOk());
 
-        User blocked = userService.findById(6).orElseThrow();
+        User blocked = userService.findByLogin("log6").orElseThrow();
         assertThat(initial.getBlocked(), is(not(equalTo(blocked.getBlocked()))));
     }
 
-    private void blockByIdAndExpect(long id, ResultMatcher status) throws Exception {
-        mvc.perform(patch("/users/" + id).param("isBlocked", "true"))
+    private void blockByLoginAndExpect(String login, ResultMatcher status) throws Exception {
+        mvc.perform(patch("/users/" + login).param("isBlocked", "true"))
                 .andDo(print())
                 .andExpect(status);
     }
@@ -290,48 +262,48 @@ public class UserControllerTest {
     @Test
     @WithMockUser(authorities = "USER")
     public void shouldDenyUserBlockingWhenUserIsNotAdmin() throws Exception {
-        blockByIdAndExpect(6, status().isUnauthorized());
+        blockByLoginAndExpect("log6", status().isUnauthorized());
     }
 
     @Test
     @WithAnonymousUser
     public void shouldDenyUserBlockingWhenUserIsNotAuthenticated() throws Exception {
-        blockByIdAndExpect(6, status().isUnauthorized());
+        blockByLoginAndExpect("log6", status().isUnauthorized());
     }
 
     @Test
     @WithMockUser(authorities = "ADMIN")
     public void shouldDeleteUserOnUserDeleteRequestWhenUserIsAdmin() throws Exception {
-        deleteByIdAndExpect(4, status().isNoContent());
+        deleteByLoginAndExpect("log4", status().isNoContent());
 
-        Optional<User> deleted = userService.findById(4);
+        Optional<User> deleted = userService.findByLogin("log4");
         assertThat(deleted, is(Optional.empty()));
     }
 
-    private void deleteByIdAndExpect(long id, ResultMatcher status) throws Exception {
-        mvc.perform(delete("/users/" + id))
+    private void deleteByLoginAndExpect(String login, ResultMatcher status) throws Exception {
+        mvc.perform(delete("/users/" + login))
                 .andDo(print())
                 .andExpect(status);
     }
 
     @Test
-    @WithMockUser(username = "e5@gmail.com", authorities = "USER")
+    @WithMockUser(username = "log5", authorities = "USER")
     public void shouldDeleteUserOnUserDeleteRequestWhenUserIsResourceOwner() throws Exception {
-        deleteByIdAndExpect(5, status().isNoContent());
+        deleteByLoginAndExpect("log5", status().isNoContent());
 
-        Optional<User> deleted = userService.findById(5);
+        Optional<User> deleted = userService.findByLogin("log5");
         assertThat(deleted, is(Optional.empty()));
     }
 
     @Test
-    @WithMockUser(username = "e3@gmail.com", authorities = "USER")
+    @WithMockUser(username = "log6", authorities = "USER")
     public void shouldDenyUserDeletionWhenUserIsNotResourceOwner() throws Exception {
-        deleteByIdAndExpect(5, status().isUnauthorized());
+        deleteByLoginAndExpect("log5", status().isUnauthorized());
     }
 
     @Test
     @WithAnonymousUser
     public void shouldDenyUserDeletionWhenUserIsNotAuthenticated() throws Exception {
-        deleteByIdAndExpect(5, status().isUnauthorized());
+        deleteByLoginAndExpect("log5", status().isUnauthorized());
     }
 }
