@@ -20,6 +20,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.hateoas.CollectionModel;
 import org.springframework.hateoas.EntityModel;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.access.prepost.PostAuthorize;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -53,12 +55,15 @@ public class UserController {
     }
 
     @GetMapping
+    @PreAuthorize("hasAuthority('ADMIN')")
     public CollectionModel<EntityModel<User>> getAll() {
         List<User> users = userService.findAll();
         return modelAssembler.toCollectionModel(users);
     }
 
     @GetMapping("/{id}")
+    @PostAuthorize("hasAuthority('USER') and returnObject.content.email == authentication.name " +
+            "or hasAuthority('ADMIN')")
     public EntityModel<User> getById(@PathVariable Long id) {
         User user = userService.findById(id)
                 .orElseThrow(() -> new  NoSuchElementException("No user with id " + id));
@@ -66,6 +71,7 @@ public class UserController {
     }
 
     @GetMapping(params = "email")
+    @PreAuthorize("hasAuthority('USER') and #email == authentication.name or hasAuthority('ADMIN')")
     public EntityModel<User> getByEmail(@RequestParam String email) {
         User user = userService.findByEmail(email)
                 .orElseThrow(() -> new  NoSuchElementException("No user with email " + email));
@@ -73,6 +79,8 @@ public class UserController {
     }
 
     @GetMapping(params = "login")
+    @PostAuthorize("hasAuthority('USER') and returnObject.content.email == authentication.name " +
+            "or hasAuthority('ADMIN')")
     public EntityModel<User> getByLogin(@RequestParam String login) {
         User user = userService.findByLogin(login)
                 .orElseThrow(() -> new  NoSuchElementException("No user with login " + login));
@@ -86,8 +94,8 @@ public class UserController {
         return modelAssembler.toModel(saved);
     }
 
-
     @PatchMapping("/{id}")
+    @PreAuthorize("@userAccessHandler.canPatch(#id)")
     public EntityModel<User> patchById(@PathVariable Long id,
                                        @RequestBody User user) {
         user.setId(id);
@@ -96,6 +104,7 @@ public class UserController {
     }
 
     @PatchMapping(value = "/{id}", params = "isBlocked")
+    @PreAuthorize("hasAuthority('ADMIN')")
     public void blockById(@PathVariable Long id,
                           @RequestParam Boolean isBlocked) {
         userService.setBlockedById(id, isBlocked);
@@ -103,6 +112,7 @@ public class UserController {
 
     @DeleteMapping("{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
+    @PreAuthorize("@userAccessHandler.canDelete(#id)")
     public void deleteById(@PathVariable Long id) {
         userService.deleteById(id);
     }

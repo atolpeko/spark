@@ -18,3 +18,12 @@ spring:
     username: sa
     password:
     driverClassName: org.h2.Driver
+  security:
+    oauth2:
+      jwt-key: debug-key
+      client:
+        client-id: debug-client
+        client-secret: debug-password
+        authorization-grant-type: client_credentials
+        scope: read
+        access-token-uri: http://localhost:9000/oauth/token
