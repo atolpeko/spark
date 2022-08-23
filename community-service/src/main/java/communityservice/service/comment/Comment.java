@@ -96,6 +96,7 @@ public class Comment implements Comparable<Comment> {
 
     public Comment() {
         createdAt = LocalDate.now();
+        likes = new TreeSet<>();
     }
 
     public Comment(Comment other) {

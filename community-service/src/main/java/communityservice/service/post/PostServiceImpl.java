@@ -49,7 +49,7 @@ import java.util.function.Supplier;
 @Service
 @Transactional
 public class PostServiceImpl implements PostService {
-    private static final Logger logger = LogManager.getLogger(CommunityServiceImpl.class);
+    private static final Logger logger = LogManager.getLogger(PostServiceImpl.class);
 
     private final CommunityRepository communityRepository;
     private final UserRepository userRepository;

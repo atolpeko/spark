@@ -73,11 +73,13 @@ public class Post implements Comparable<Post> {
     @JsonIgnore
     private Community community;
 
-    @OneToMany(mappedBy = "post", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    @OneToMany(mappedBy = "post", cascade = CascadeType.MERGE,
+            fetch = FetchType.EAGER, orphanRemoval = true)
     @JsonIgnore
     private Set<PostLike> likes;
 
-    @OneToMany(mappedBy = "post", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    @OneToMany(mappedBy = "post", cascade = CascadeType.MERGE,
+            fetch = FetchType.EAGER, orphanRemoval = true)
     @JsonIgnore
     private Set<Comment> comments;
 
