@@ -22,8 +22,10 @@ spring:
     oauth2:
       jwt-key: debug-key
       client:
-        client-id: debug-client
+        client-id: debug-internal-client
         client-secret: debug-password
         authorization-grant-type: client_credentials
         scope: read
         access-token-uri: http://localhost:9000/oauth/token
+feign:
+  user-service-url: http://localhost:5960/

@@ -19,6 +19,7 @@ package communityservice.service.user;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import communityservice.service.community.Community;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Entity;
 
 import javax.persistence.Id;
@@ -41,7 +42,7 @@ public class User {
     @NotBlank(message = "Login is mandatory")
     private String login;
 
-    @ManyToMany(mappedBy = "users")
+    @ManyToMany(mappedBy = "users", cascade = CascadeType.MERGE)
     @JsonIgnore
     private Set<Community> communities;
 
@@ -53,11 +54,44 @@ public class User {
     }
 
     public User() {
+        communities = new TreeSet<>();
     }
 
     public User(User other) {
         login = other.login;
-        communities = other.communities;
+        communities = new TreeSet<>(other.communities);
+    }
+
+    /**
+     * Adds the specified community to this user.
+     * <p>
+     * Synchronised for bidirectional mapping.
+     *
+     * @param community community to add
+     */
+    public void addCommunity(Community community) {
+        communities.add(community);
+
+        // Not using addUser() to avoid infinite recursion
+        Set<User> users = community.getUsers();
+        users.add(this);
+        community.setUsers(users);
+    }
+
+    /**
+     * Delete the specified community from this user.
+     * <p>
+     * Synchronised for bidirectional mapping.
+     *
+     * @param community community to be deleted
+     */
+    public void deleteCommunity(Community community) {
+        communities.remove(community);
+
+        // Not using deleteUser() to avoid infinite recursion
+        Set<User> users = community.getUsers();
+        users.remove(this);
+        community.setUsers(users);
     }
 
     public String getLogin() {
