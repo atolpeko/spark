@@ -72,7 +72,8 @@ public class Community implements Comparable<Community> {
     @JsonIgnore
     private Set<User> users;
 
-    @OneToMany(mappedBy = "community", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    @OneToMany(mappedBy = "community", cascade = CascadeType.MERGE,
+            orphanRemoval = true, fetch = FetchType.EAGER)
     @JsonIgnore
     private Set<Post> posts;
 
