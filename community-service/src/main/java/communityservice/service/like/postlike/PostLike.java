@@ -14,10 +14,11 @@
  * limitations under the License.
  */
 
-package communityservice.service.like;
+package communityservice.service.like.postlike;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
+import communityservice.service.like.AbstractLike;
 import communityservice.service.post.Post;
 import communityservice.service.user.User;
 

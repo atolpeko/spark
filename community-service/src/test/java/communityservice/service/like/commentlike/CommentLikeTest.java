@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package communityservice.service.like;
+package communityservice.service.like.commentlike;
 
 import communityservice.service.comment.Comment;
 import communityservice.service.user.User;

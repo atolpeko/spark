@@ -14,11 +14,12 @@
  * limitations under the License.
  */
 
-package communityservice.service.like;
+package communityservice.service.like.commentlike;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import communityservice.service.comment.Comment;
+import communityservice.service.like.AbstractLike;
 import communityservice.service.user.User;
 
 import javax.persistence.DiscriminatorValue;

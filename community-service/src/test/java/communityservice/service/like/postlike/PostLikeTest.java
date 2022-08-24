@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package communityservice.service.like;
+package communityservice.service.like.postlike;
 
 import communityservice.service.user.User;
 import communityservice.service.post.Post;
