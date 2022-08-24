@@ -27,3 +27,5 @@ spring:
         authorization-grant-type: client_credentials
         scope: read
         access-token-uri: http://localhost:9000/oauth/token
+feign:
+  user-service-url: http://test-url/
