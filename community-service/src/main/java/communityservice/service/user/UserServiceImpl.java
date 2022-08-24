@@ -147,11 +147,16 @@ public class UserServiceImpl implements UserService {
     public void unsubscribeUser(long communityId, String login) {
         try {
             Community community = getCommunity(communityId);
-            User user = User.builder().withLogin(login).build();
+            User user = findByLogin(login)
+                    .orElseThrow(() -> new IllegalModificationException("No user with login " + login));
             checkUserExistence(user);
             user.deleteCommunity(community);
             validate(user);
-            persistUser(user);
+            if (user.getCommunities().isEmpty()) {
+                persistUser(user);
+            } else {
+                deleteUser(login);
+            }
             logger.info("User " + login + " left community " + community.getName());
         } catch (IllegalModificationException | RemoteResourceException e) {
             throw e;
@@ -161,5 +166,19 @@ public class UserServiceImpl implements UserService {
         } catch (Exception e) {
             throw new RemoteResourceException("User database unavailable", e);
         }
+    }
+
+    private Optional<User> findByLogin(String login) {
+        Supplier<Optional<User>> findByLogin = () -> userRepository.findById(login);
+        return circuitBreaker.decorateSupplier(findByLogin).get();
+    }
+
+    private void deleteUser(String login) {
+        Runnable delete = () -> {
+            userRepository.deleteById(login);
+            userRepository.flush();
+        };
+
+        circuitBreaker.decorateRunnable(delete).run();
     }
 }

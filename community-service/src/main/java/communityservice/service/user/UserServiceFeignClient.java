@@ -27,7 +27,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
  * Provides access to user microservice.
  */
 @FeignClient(name = "user-service", url = "${feign.user-service-url}")
-interface UserServiceFeignClient {
+public interface UserServiceFeignClient {
 
     /**
      * Looks for a user with the specified login.
