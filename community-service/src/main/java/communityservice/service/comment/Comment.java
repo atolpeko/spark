@@ -19,7 +19,7 @@ package communityservice.service.comment;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-import communityservice.service.like.CommentLike;
+import communityservice.service.like.commentlike.CommentLike;
 import communityservice.service.user.User;
 import communityservice.service.post.Post;
 
@@ -72,7 +72,8 @@ public class Comment implements Comparable<Comment> {
     @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     private User user;
 
-    @OneToMany(mappedBy = "comment", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    @OneToMany(mappedBy = "comment", cascade = CascadeType.MERGE,
+            fetch = FetchType.EAGER, orphanRemoval = true)
     @JsonIgnore
     private Set<CommentLike> likes;
 

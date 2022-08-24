@@ -149,5 +149,4 @@ public class PostLikeServiceImplTest {
         Optional<PostLike> deleted = likeService.findById(1L);
         assertThat(deleted, is(Optional.empty()));
     }
-
 }
