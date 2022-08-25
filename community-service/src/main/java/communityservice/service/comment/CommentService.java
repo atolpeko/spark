@@ -58,13 +58,14 @@ public interface CommentService {
      * might have changed the comment instance completely.
      *
      * @param comment comment to save
+     * @param postId ID of the post to save comment to
      *
      * @return the saved comment
      *
      * @throws IllegalModificationException either if a comment has invalid data or already exists
      * @throws RemoteResourceException if there is any problem with the remote comment repository
      */
-    Comment save(Comment comment);
+    Comment save(Comment comment, long postId);
 
     /**
      * Updates the comment with the specified ID in the remote comment repository.

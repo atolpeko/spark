@@ -12,3 +12,8 @@ INSERT INTO posts(message, created_at, user_login, community_id)
 VALUES ('message1', '2003-01-23', 'login1', 1),
        ('message2', '2003-01-23', 'login1', 1),
        ('message3', '2003-01-23', 'login2', 2);
+
+INSERT INTO comments(message, created_at, post_id, user_login)
+VALUES ('message1', '2003-01-23', 1, 'login1'),
+       ('message2', '2003-01-23', 1, 'login1'),
+       ('message3', '2003-01-23', 2, 'login2');

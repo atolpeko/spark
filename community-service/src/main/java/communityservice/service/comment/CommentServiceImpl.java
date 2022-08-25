@@ -83,8 +83,12 @@ public class CommentServiceImpl implements CommentService {
     }
 
     private void checkPostExistence(long id) {
+        findPost(id).orElseThrow(() -> new NoSuchElementException("No post with ID " + id));
+    }
+
+    private Optional<Post> findPost(long id) {
         Supplier<Optional<Post>> find = () -> postRepository.findById(id);
-        find.get().orElseThrow(() -> new NoSuchElementException("No post with ID " + id));
+        return circuitBreaker.decorateSupplier(find).get();
     }
 
     @Override
@@ -98,10 +102,10 @@ public class CommentServiceImpl implements CommentService {
     }
 
     @Override
-    public Comment save(Comment comment) {
+    public Comment save(Comment comment, long postId) {
         try {
-            validate(comment);
-            Comment commentToSave = prepareSaveData(comment);
+            Comment commentToSave = prepareSaveData(comment, postId);
+            validate(commentToSave);
             Comment saved = persistComment(commentToSave);
             logger.info("Comment " + saved.getId() + " saved");
             return saved;
@@ -110,6 +114,16 @@ public class CommentServiceImpl implements CommentService {
         } catch (Exception e) {
             throw new RemoteResourceException("Comment database unavailable", e);
         }
+    }
+
+    private Comment prepareSaveData(Comment comment, long postId) {
+        Post post = findPost(postId)
+                .orElseThrow(() -> new NoSuchElementException("No post with ID " + postId));
+        Comment commentToSave = new Comment(comment);
+        commentToSave.setId(null);
+        commentToSave.setPost(post);
+
+        return commentToSave;
     }
 
     private void validate(Comment comment) {
@@ -135,13 +149,6 @@ public class CommentServiceImpl implements CommentService {
     private void checkUserExistence(String userLogin) {
         Supplier<Optional<User>> find = () -> userRepository.findById(userLogin);
         find.get().orElseThrow(() -> new IllegalModificationException("No user with login " + userLogin));
-    }
-
-    private Comment prepareSaveData(Comment comment) {
-        Comment commentToSave = new Comment(comment);
-        commentToSave.setId(null);
-
-        return commentToSave;
     }
 
     private Comment persistComment(Comment comment) {

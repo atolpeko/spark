@@ -66,7 +66,7 @@ public class Comment implements Comparable<Comment> {
     @JsonIgnore
     private Post post;
 
-    @OneToOne
+    @ManyToOne
     @NotNull(message = "User is mandatory")
     @Valid
     @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
