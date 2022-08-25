@@ -21,7 +21,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 
 import communityservice.service.comment.Comment;
 import communityservice.service.community.Community;
-import communityservice.service.like.PostLike;
+import communityservice.service.like.postlike.PostLike;
 import communityservice.service.user.User;
 
 import javax.persistence.CascadeType;

@@ -56,13 +56,14 @@ public interface PostService {
      * might have changed the post instance completely.
      *
      * @param post post to save
+     * @param communityId ID of the community to save post to
      *
      * @return the saved post
      *
      * @throws IllegalModificationException either if a post has invalid data or already exists
      * @throws RemoteResourceException if there is any problem with the remote post repository
      */
-    Post save(Post post);
+    Post save(Post post, long communityId);
 
     /**
      * Updates the post with the specified ID in the remote post repository.

@@ -149,14 +149,14 @@ public class PostServiceImplTest {
         when(postRepository.save(any(Post.class))).thenReturn(post);
         when(validator.validate(any(Post.class))).thenReturn(Collections.emptySet());
 
-        Post saved = postService.save(post);
+        Post saved = postService.save(post, 1);
         assertThat(saved, equalTo(post));
     }
 
     @Test
     public void shouldThrowExceptionWhenPostIsInvalid() {
         when(validator.validate(any(Post.class))).thenThrow(IllegalModificationException.class);
-        assertThrows(IllegalModificationException.class, () -> postService.save(new Post()));
+        assertThrows(IllegalModificationException.class, () -> postService.save(new Post(), 1));
     }
 
     @Test

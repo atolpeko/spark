@@ -20,7 +20,6 @@ import communityservice.data.CommunityRepository;
 import communityservice.data.PostRepository;
 import communityservice.data.UserRepository;
 import communityservice.service.community.Community;
-import communityservice.service.community.CommunityServiceImpl;
 import communityservice.service.exception.IllegalModificationException;
 import communityservice.service.exception.RemoteResourceException;
 import communityservice.service.user.User;
@@ -84,8 +83,12 @@ public class PostServiceImpl implements PostService {
     }
 
     private void checkCommunityExistence(long id) {
+        findCommunity(id).orElseThrow(() -> new NoSuchElementException("No community with ID " + id));
+    }
+
+    private Optional<Community> findCommunity(long id) {
         Supplier<Optional<Community>> find = () -> communityRepository.findById(id);
-        find.get().orElseThrow(() -> new NoSuchElementException("No community with ID " + id));
+        return circuitBreaker.decorateSupplier(find).get();
     }
 
     @Override
@@ -99,10 +102,10 @@ public class PostServiceImpl implements PostService {
     }
 
     @Override
-    public Post save(Post post) {
+    public Post save(Post post, long communityId) {
         try {
-            validate(post);
-            Post postToSave = prepareSaveData(post);
+            Post postToSave = prepareSaveData(post, communityId);
+            validate(postToSave);
             Post saved = persistPost(postToSave);
             logger.info("Post " + saved.getId() + " saved");
             return saved;
@@ -138,11 +141,14 @@ public class PostServiceImpl implements PostService {
         find.get().orElseThrow(() -> new IllegalModificationException("No user with login " + userLogin));
     }
 
-    private Post prepareSaveData(Post post) {
-        Post communityToSave = new Post(post);
-        communityToSave.setId(null);
+    private Post prepareSaveData(Post post, long communityId) {
+        Community community = findCommunity(communityId)
+                .orElseThrow(() -> new NoSuchElementException("No community with ID " + communityId));
+        Post postToSave = new Post(post);
+        postToSave.setId(null);
+        postToSave.setCommunity(community);
 
-        return communityToSave;
+        return postToSave;
     }
 
     private Post persistPost(Post post) {

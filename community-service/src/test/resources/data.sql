@@ -6,4 +6,9 @@ VALUES ('name1', 'description1', '2003-01-23'),
        ('name3', 'description3', '2003-01-23');
 
 INSERT INTO community_users(community_id, user_id)
-VALUES (1, 'login1'), (1, 'login2'), (2, 'login2'), (3, 'login3')
+VALUES (1, 'login1'), (1, 'login2'), (2, 'login2'), (3, 'login3');
+
+INSERT INTO posts(message, created_at, user_login, community_id)
+VALUES ('message1', '2003-01-23', 'login1', 1),
+       ('message2', '2003-01-23', 'login1', 1),
+       ('message3', '2003-01-23', 'login2', 2);
