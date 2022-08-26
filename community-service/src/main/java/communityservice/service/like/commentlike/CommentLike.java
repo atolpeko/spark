@@ -33,7 +33,7 @@ import java.time.LocalDateTime;
  * Comment like domain class.
  */
 @Entity
-@DiscriminatorValue("COMMENT")
+@DiscriminatorValue("COMMENT_LIKE")
 public class CommentLike extends AbstractLike {
 
     @ManyToOne

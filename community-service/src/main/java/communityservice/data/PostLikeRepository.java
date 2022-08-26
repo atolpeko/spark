@@ -19,10 +19,12 @@ package communityservice.data;
 import communityservice.service.like.postlike.PostLike;
 
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Optional;
 
 /**
  * A PostLikeRepository abstracts a collection of PostLike objects.
@@ -39,4 +41,15 @@ public interface PostLikeRepository extends JpaRepository<PostLike, Long> {
      */
     @Query("FROM PostLike WHERE post.id = ?1")
     List<PostLike> findAllByPostId(long postId);
+
+    // The default implementation does not work for an unknown reason
+    @Override
+    @Query("FROM PostLike WHERE id = ?1")
+    Optional<PostLike> findById(Long id);
+
+    // The default implementation does not work for an unknown reason
+    @Override
+    @Modifying
+    @Query("DELETE FROM PostLike WHERE id = ?1")
+    void deleteById(Long id);
 }

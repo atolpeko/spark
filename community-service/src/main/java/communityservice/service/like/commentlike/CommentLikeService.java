@@ -55,6 +55,7 @@ public interface CommentLikeService {
      * Use the returned like for further operations as the save operation
      * might have changed the like instance completely.
      *
+     * @param commentID ID of the comment to like
      * @param like like to save
      *
      * @return the saved like
@@ -62,7 +63,7 @@ public interface CommentLikeService {
      * @throws IllegalModificationException either if a like has invalid data or already exists
      * @throws RemoteResourceException if there is any problem with the remote like repository
      */
-    CommentLike save(CommentLike like);
+    CommentLike save(CommentLike like, long commentID);
 
     /**
      * Deletes the like with the specified ID from the remote like repository.

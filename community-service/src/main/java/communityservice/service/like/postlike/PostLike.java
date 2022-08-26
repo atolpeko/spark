@@ -33,7 +33,7 @@ import java.time.LocalDateTime;
  * Post like domain class.
  */
 @Entity
-@DiscriminatorValue("POST")
+@DiscriminatorValue("POST_LIKE")
 public class PostLike extends AbstractLike {
 
     @ManyToOne

@@ -19,10 +19,12 @@ package communityservice.data;
 import communityservice.service.like.commentlike.CommentLike;
 
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Optional;
 
 /**
  * A CommentLikeRepository abstracts a collection of CommentLike objects.
@@ -39,4 +41,15 @@ public interface CommentLikeRepository extends JpaRepository<CommentLike, Long> 
      */
     @Query("FROM CommentLike WHERE comment.id = ?1")
     List<CommentLike> findAllByCommentId(long commentId);
+
+    // The default implementation does not work for an unknown reason
+    @Override
+    @Query("FROM CommentLike WHERE id = ?1")
+    Optional<CommentLike> findById(Long id);
+
+    // The default implementation does not work for an unknown reason
+    @Override
+    @Modifying
+    @Query("DELETE FROM CommentLike WHERE id = ?1")
+    void deleteById(Long id);
 }

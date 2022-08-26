@@ -83,8 +83,12 @@ public class CommentLikeServiceImpl implements CommentLikeService {
     }
 
     private void checkCommentExistence(long id) {
+        findComment(id).orElseThrow(() -> new NoSuchElementException("No comment with ID " + id));
+    }
+
+    private Optional<Comment> findComment(long id) {
         Supplier<Optional<Comment>> find = () -> commentRepository.findById(id);
-        find.get().orElseThrow(() -> new NoSuchElementException("No comment with ID " + id));
+        return circuitBreaker.decorateSupplier(find).get();
     }
 
     @Override
@@ -98,10 +102,10 @@ public class CommentLikeServiceImpl implements CommentLikeService {
     }
 
     @Override
-    public CommentLike save(CommentLike like) {
+    public CommentLike save(CommentLike like, long commentId) {
         try {
-            validate(like);
-            CommentLike likeToSave = prepareSaveData(like);
+            CommentLike likeToSave = prepareSaveData(like, commentId);
+            validate(likeToSave);
             CommentLike saved = persistLike(likeToSave);
             logger.info("Like " + saved.getId() + " saved");
             return saved;
@@ -110,6 +114,16 @@ public class CommentLikeServiceImpl implements CommentLikeService {
         } catch (Exception e) {
             throw new RemoteResourceException("Like database unavailable", e);
         }
+    }
+
+    private CommentLike prepareSaveData(CommentLike like, long commentId) {
+        Comment comment = findComment(commentId)
+                .orElseThrow(() -> new NoSuchElementException("No comment with ID " + commentId));
+        CommentLike likeToSave = new CommentLike(like);
+        likeToSave.setId(null);
+        likeToSave.setComment(comment);
+
+        return likeToSave;
     }
 
     private void validate(CommentLike like) {
@@ -146,13 +160,6 @@ public class CommentLikeServiceImpl implements CommentLikeService {
         if (matches >= 1) {
             throw new IllegalModificationException("Such a like already exists");
         }
-    }
-
-    private CommentLike prepareSaveData(CommentLike like) {
-        CommentLike likeToSave = new CommentLike(like);
-        likeToSave.setId(null);
-
-        return likeToSave;
     }
 
     private CommentLike persistLike(CommentLike like) {
