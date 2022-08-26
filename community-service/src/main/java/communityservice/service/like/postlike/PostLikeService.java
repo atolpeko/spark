@@ -56,13 +56,14 @@ public interface PostLikeService {
      * might have changed the like instance completely.
      *
      * @param like like to save
+     * @param postId ID of the post to like
      *
      * @return the saved like
      *
      * @throws IllegalModificationException either if a like has invalid data or already exists
      * @throws RemoteResourceException if there is any problem with the remote like repository
      */
-    PostLike save(PostLike like);
+    PostLike save(PostLike like, long postId);
 
     /**
      * Deletes the like with the specified ID from the remote like repository.

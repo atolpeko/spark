@@ -83,8 +83,12 @@ public class PostLikeServiceImpl implements PostLikeService {
     }
 
     private void checkPostExistence(long id) {
+        findPost(id).orElseThrow(() -> new NoSuchElementException("No post with ID " + id));
+    }
+
+    private Optional<Post> findPost(long id) {
         Supplier<Optional<Post>> find = () -> postRepository.findById(id);
-        find.get().orElseThrow(() -> new NoSuchElementException("No post with ID " + id));
+        return circuitBreaker.decorateSupplier(find).get();
     }
 
     @Override
@@ -98,10 +102,10 @@ public class PostLikeServiceImpl implements PostLikeService {
     }
 
     @Override
-    public PostLike save(PostLike like) {
+    public PostLike save(PostLike like, long postId) {
         try {
-            validate(like);
-            PostLike likeToSave = prepareSaveData(like);
+            PostLike likeToSave = prepareSaveData(like, postId);
+            validate(likeToSave);
             PostLike saved = persistLike(likeToSave);
             logger.info("Like " + saved.getId() + " saved");
             return saved;
@@ -110,6 +114,16 @@ public class PostLikeServiceImpl implements PostLikeService {
         } catch (Exception e) {
             throw new RemoteResourceException("Like database unavailable", e);
         }
+    }
+
+    private PostLike prepareSaveData(PostLike like, long postId) {
+        Post post = findPost(postId)
+                .orElseThrow(() -> new NoSuchElementException("No post with ID " + postId));
+        PostLike likeToSave = new PostLike(like);
+        likeToSave.setId(null);
+        likeToSave.setPost(post);
+
+        return likeToSave;
     }
 
     private void validate(PostLike like) {
@@ -146,13 +160,6 @@ public class PostLikeServiceImpl implements PostLikeService {
         if (matches >= 1) {
             throw new IllegalModificationException("Such a like already exists");
         }
-    }
-
-    private PostLike prepareSaveData(PostLike like) {
-        PostLike likeToSave = new PostLike(like);
-        likeToSave.setId(null);
-
-        return likeToSave;
     }
 
     private PostLike persistLike(PostLike like) {

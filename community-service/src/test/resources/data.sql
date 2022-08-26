@@ -17,3 +17,8 @@ INSERT INTO comments(message, created_at, post_id, user_login)
 VALUES ('message1', '2003-01-23', 1, 'login1'),
        ('message2', '2003-01-23', 1, 'login1'),
        ('message3', '2003-01-23', 2, 'login2');
+
+INSERT INTO likes(type, created_at, user_login, post_id, comment_id)
+VALUES ('POST_LIKE', '2003-01-23', 'login1', 1, NULL),
+       ('POST_LIKE', '2003-01-23', 'login2', 1, NULL),
+       ('POST_LIKE', '2003-01-23', 'login3', 2, NULL);

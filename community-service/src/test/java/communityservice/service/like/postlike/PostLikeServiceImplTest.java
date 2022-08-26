@@ -128,14 +128,14 @@ public class PostLikeServiceImplTest {
         when(likeRepository.save(any(PostLike.class))).thenReturn(like);
         when(validator.validate(any(PostLike.class))).thenReturn(Collections.emptySet());
 
-        PostLike saved = likeService.save(like);
+        PostLike saved = likeService.save(like, 1);
         assertThat(saved, equalTo(like));
     }
 
     @Test
     public void shouldThrowExceptionWhenLikeIsInvalid() {
         when(validator.validate(any(PostLike.class))).thenThrow(IllegalModificationException.class);
-        assertThrows(IllegalModificationException.class, () -> likeService.save(new PostLike()));
+        assertThrows(IllegalModificationException.class, () -> likeService.save(new PostLike(), 1));
     }
 
     @Test
