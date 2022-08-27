@@ -30,6 +30,16 @@ oauth:
         - write
       accessTokenValiditySeconds: 1800
       refreshTokenValiditySeconds: 43200
+
+    - name: debug-internal-client
+      password: client_credentials
+      grantTypes:
+        - password
+      scopes:
+        - read
+        - write
+      accessTokenValiditySeconds: 1800
+      refreshTokenValiditySeconds: 43200
   users:
     - name: debug-admin
       password: debug-password
