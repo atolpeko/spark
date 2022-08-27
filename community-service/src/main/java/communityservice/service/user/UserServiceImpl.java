@@ -153,9 +153,9 @@ public class UserServiceImpl implements UserService {
             user.deleteCommunity(community);
             validate(user);
             if (user.getCommunities().isEmpty()) {
-                persistUser(user);
-            } else {
                 deleteUser(login);
+            } else {
+                persistUser(user);
             }
             logger.info("User " + login + " left community " + community.getName());
         } catch (IllegalModificationException | RemoteResourceException e) {

@@ -17,13 +17,18 @@
 package communityservice.service.user;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+
+import communityservice.service.comment.Comment;
 import communityservice.service.community.Community;
+import communityservice.service.like.AbstractLike;
+import communityservice.service.post.Post;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Entity;
 
 import javax.persistence.Id;
 import javax.persistence.ManyToMany;
+import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import javax.validation.constraints.NotBlank;
 
@@ -46,6 +51,18 @@ public class User {
     @JsonIgnore
     private Set<Community> communities;
 
+    @OneToMany(mappedBy = "user", cascade = CascadeType.REMOVE)
+    @JsonIgnore
+    private Set<Post> posts;
+
+    @OneToMany(mappedBy = "user", cascade = CascadeType.REMOVE)
+    @JsonIgnore
+    private Set<Comment> comments;
+
+    @OneToMany(mappedBy = "user", cascade = CascadeType.REMOVE)
+    @JsonIgnore
+    private Set<AbstractLike> likes;
+
     /**
      * @return user builder
      */
@@ -55,11 +72,17 @@ public class User {
 
     public User() {
         communities = new TreeSet<>();
+        posts = new TreeSet<>();
+        comments = new TreeSet<>();
+        likes = new TreeSet<>();
     }
 
     public User(User other) {
         login = other.login;
         communities = new TreeSet<>(other.communities);
+        posts = new TreeSet<>(other.posts);
+        comments = new TreeSet<>(other.comments);
+        likes = new TreeSet<>(other.likes);
     }
 
     /**
@@ -94,6 +117,78 @@ public class User {
         community.setUsers(users);
     }
 
+    /**
+     * Adds the specified post to this user.
+     * <p>
+     * Synchronised for bidirectional mapping.
+     *
+     * @param post post to add
+     */
+    public void addPost(Post post) {
+        posts.add(post);
+        post.setUser(this);
+    }
+
+    /**
+     * Delete the specified post from this user.
+     * <p>
+     * Synchronised for bidirectional mapping.
+     *
+     * @param post post to be deleted
+     */
+    public void deletePost(Post post) {
+        posts.remove(post);
+        post.setUser(null);
+    }
+
+    /**
+     * Adds the specified comment to this user.
+     * <p>
+     * Synchronised for bidirectional mapping.
+     *
+     * @param comment comment to add
+     */
+    public void addComment(Comment comment) {
+        comments.add(comment);
+        comment.setUser(this);
+    }
+
+    /**
+     * Delete the specified comment from this user.
+     * <p>
+     * Synchronised for bidirectional mapping.
+     *
+     * @param comment comment to be deleted
+     */
+    public void deleteComment(Comment comment) {
+        comments.remove(comment);
+        comment.setUser(null);
+    }
+
+    /**
+     * Adds the specified like to this user.
+     * <p>
+     * Synchronised for bidirectional mapping.
+     *
+     * @param like like to add
+     */
+    public void addLike(AbstractLike like) {
+        likes.add(like);
+        like.setUser(this);
+    }
+
+    /**
+     * Delete the specified like from this user.
+     * <p>
+     * Synchronised for bidirectional mapping.
+     *
+     * @param like like to be deleted
+     */
+    public void deleteLike(AbstractLike like) {
+        likes.remove(like);
+        like.setUser(null);
+    }
+
     public String getLogin() {
         return login;
     }
@@ -110,6 +205,30 @@ public class User {
         this.communities = new TreeSet<>(community);
     }
 
+    public Set<Post> getPosts() {
+        return new TreeSet<>(posts);
+    }
+
+    public void setPosts(Set<Post> posts) {
+        this.posts = new TreeSet<>(posts);
+    }
+
+    public Set<Comment> getComments() {
+        return new TreeSet<>(comments);
+    }
+
+    public void setComments(Set<Comment> comments) {
+        this.comments = new TreeSet<>(comments);
+    }
+
+    public Set<AbstractLike> getLikes() {
+        return new TreeSet<>(likes);
+    }
+
+    public void setLikes(Set<AbstractLike> likes) {
+        this.likes = new TreeSet<>(likes);
+    }
+
     @Override
     public boolean equals(Object other) {
         if (this == other) {
@@ -121,13 +240,11 @@ public class User {
         }
 
         User user = (User) other;
-        // Not using communities field to avoid infinite recursion
         return Objects.equals(login, user.login);
     }
 
     @Override
     public int hashCode() {
-        // Not using communities field to avoid infinite recursion
         return Objects.hash(login);
     }
 
@@ -136,6 +253,9 @@ public class User {
         // Not using communities field to avoid infinite recursion
         return getClass().getName() + "{" +
                 "login='" + login + '\'' +
+                ", posts=" + posts +
+                ", comments=" + comments +
+                ", likes=" + likes +
                 '}';
     }
 
@@ -158,6 +278,21 @@ public class User {
 
         public Builder withCommunities(Set<Community> communities) {
             User.this.communities = new TreeSet<>(communities);
+            return this;
+        }
+
+        public Builder withPosts(Set<Post> posts) {
+            User.this.posts = new TreeSet<>(posts);
+            return this;
+        }
+
+        public Builder withComments(Set<Comment> comments) {
+            User.this.comments = new TreeSet<>(comments);
+            return this;
+        }
+
+        public Builder withLikes(Set<AbstractLike> likes) {
+            User.this.likes = new TreeSet<>(likes);
             return this;
         }
     }

@@ -65,7 +65,7 @@ public class Community implements Comparable<Community> {
     @JsonProperty(access = JsonProperty.Access.READ_ONLY)
     private LocalDateTime createdAt;
 
-    @ManyToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    @ManyToMany(cascade = CascadeType.MERGE, fetch = FetchType.EAGER)
     @JoinTable(name = "community_users",
             joinColumns = @JoinColumn(name = "community_id", nullable = false),
             inverseJoinColumns = @JoinColumn(name = "user_id", nullable = false))
@@ -218,14 +218,12 @@ public class Community implements Comparable<Community> {
         Community community = (Community) other;
         return Objects.equals(name, community.name)
                 && Objects.equals(description, community.description)
-                && Objects.equals(createdAt, community.createdAt)
-                && Objects.equals(users, community.users)
-                && Objects.equals(posts, community.posts);
+                && Objects.equals(createdAt, community.createdAt);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(name, description, createdAt, users, posts);
+        return Objects.hash(name, description, createdAt);
     }
 
     @Override

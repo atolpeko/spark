@@ -29,6 +29,7 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Inheritance;
 import javax.persistence.InheritanceType;
+import javax.persistence.ManyToOne;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
 import javax.validation.Valid;
@@ -54,7 +55,7 @@ public abstract class AbstractLike implements Comparable<AbstractLike> {
     @JsonProperty(access = JsonProperty.Access.READ_ONLY)
     private LocalDateTime createdAt;
 
-    @OneToOne
+    @ManyToOne
     @NotNull(message = "User is mandatory")
     @Valid
     @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
@@ -127,10 +128,11 @@ public abstract class AbstractLike implements Comparable<AbstractLike> {
 
     @Override
     public String toString() {
+        // Not using user field to avoid infinite recursion
         return getClass().getName() + "{" +
                 "id=" + id +
                 ", createdAt=" + createdAt +
-                ", user=" + user +
+                ", userLogin=" + user.getLogin() +
                 '}';
     }
 }

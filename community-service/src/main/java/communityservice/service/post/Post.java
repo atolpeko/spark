@@ -243,28 +243,25 @@ public class Post implements Comparable<Post> {
         }
 
         Post post = (Post) other;
-        // Not using community field to avoid infinite recursion
         return Objects.equals(message, post.message)
                 && Objects.equals(createdAt, post.createdAt)
-                && Objects.equals(user, post.user)
-                && Objects.equals(likes, post.likes)
-                && Objects.equals(comments, post.comments);
+                && Objects.equals(community, post.community)
+                && Objects.equals(user, post.user);
     }
 
     @Override
     public int hashCode() {
-        // Not using community field to avoid infinite recursion
-        return Objects.hash(message, createdAt, user, likes, comments);
+        return Objects.hash(message, createdAt, community, user);
     }
 
     @Override
     public String toString() {
-        // Not using community field to avoid infinite recursion
+        // Not using community and user fields to avoid infinite recursion
         return getClass().getName() + "{" +
                 "id=" + id +
                 ", message='" + message + '\'' +
                 ", createdAt=" + createdAt +
-                ", user=" + user +
+                ", userLogin=" + user.getLogin() +
                 ", communityID=" + community.getId() +
                 ", likes=" + likes +
                 ", comments=" + comments +

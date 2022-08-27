@@ -22,6 +22,9 @@ import org.springframework.hateoas.EntityModel;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.access.prepost.PostAuthorize;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -38,8 +41,10 @@ import userservice.service.User;
 import userservice.service.UserService;
 
 import javax.validation.Valid;
+import java.util.Collection;
 import java.util.List;
 import java.util.NoSuchElementException;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping(path = "/users", produces = "application/json")
@@ -55,26 +60,43 @@ public class UserController {
     }
 
     @GetMapping
-    @PreAuthorize("hasAuthority('ADMIN')")
     public CollectionModel<EntityModel<User>> getAll() {
         List<User> users = userService.findAll();
+        users.forEach(this::filter);
         return modelAssembler.toCollectionModel(users);
     }
 
+    private void filter(User user) {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (!hasRole(authentication, "ADMIN") && !userIsOwner(authentication, user)) {
+            user.setPersonalData(null);
+        }
+    }
+
+    private boolean hasRole(Authentication authentication, String role) {
+        Collection<? extends GrantedAuthority> authorities = authentication.getAuthorities();
+        return authorities.stream()
+                .anyMatch(authority -> authority.getAuthority().equals(role));
+    }
+
+    private boolean userIsOwner(Authentication authentication, User user) {
+        String login = user.getLogin();
+        return authentication.getName().equals(login);
+    }
+
     @GetMapping(params = "login")
-    @PreAuthorize("hasAuthority('USER') and #login == authentication.name or hasAuthority('ADMIN')")
     public EntityModel<User> getByLogin(@RequestParam String login) {
         User user = userService.findByLogin(login)
                 .orElseThrow(() -> new  NoSuchElementException("No user with login " + login));
+        filter(user);
         return modelAssembler.toModel(user);
     }
 
     @GetMapping(params = "email")
-    @PostAuthorize("hasAuthority('USER') and returnObject.content.login == authentication.name" +
-            " or hasAuthority('ADMIN')")
     public EntityModel<User> getByEmail(@RequestParam String email) {
         User user = userService.findByEmail(email)
                 .orElseThrow(() -> new  NoSuchElementException("No user with email " + email));
+        filter(user);
         return modelAssembler.toModel(user);
     }
 

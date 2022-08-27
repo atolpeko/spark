@@ -28,6 +28,7 @@ import javax.persistence.ManyToOne;
 import javax.validation.constraints.NotNull;
 
 import java.time.LocalDateTime;
+import java.util.Objects;
 
 /**
  * Comment like domain class.
@@ -85,14 +86,17 @@ public class CommentLike extends AbstractLike {
             return false;
         }
 
-        // Not using comment field to avoid infinite recursion
-        return super.equals(other);
+        if (!super.equals(other)) {
+            return false;
+        }
+
+        CommentLike that = (CommentLike) other;
+        return Objects.equals(comment, that.comment);
     }
 
     @Override
     public int hashCode() {
-        // Not using comment field to avoid infinite recursion
-        return super.hashCode();
+        return Objects.hash(super.hashCode(), comment);
     }
 
     @Override

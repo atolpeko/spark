@@ -178,29 +178,27 @@ public class Comment implements Comparable<Comment> {
             return false;
         }
 
-        // Not using post field to avoid infinite recursion
         Comment comment = (Comment) other;
-        return  Objects.equals(message, comment.message)
+        return Objects.equals(message, comment.message)
                 && Objects.equals(createdAt, comment.createdAt)
                 && Objects.equals(user, comment.user)
-                && Objects.equals(likes, comment.likes);
+                && Objects.equals(post, comment.post);
     }
 
     @Override
     public int hashCode() {
-        // Not using post field to avoid infinite recursion
-        return Objects.hash(message, createdAt, user);
+        return Objects.hash(message, createdAt, user, post);
     }
 
     @Override
     public String toString() {
-        // Not using post field to avoid infinite recursion
+        // Not using post and user fields to avoid infinite recursion
         return getClass().getName() + "{" +
                 "id=" + id +
                 ", message='" + message + '\'' +
                 ", createdAt=" + createdAt +
                 ", postId=" + post.getId() +
-                ", user=" + user +
+                ", userLogin=" + user.getLogin() +
                 ", likes=" + likes +
                 '}';
     }

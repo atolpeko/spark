@@ -28,6 +28,7 @@ import javax.persistence.ManyToOne;
 import javax.validation.constraints.NotNull;
 
 import java.time.LocalDateTime;
+import java.util.Objects;
 
 /**
  * Post like domain class.
@@ -85,14 +86,17 @@ public class PostLike extends AbstractLike {
             return false;
         }
 
-        // Not using post field to avoid infinite recursion
-        return super.equals(other);
+        if (!super.equals(other)) {
+            return false;
+        }
+
+        PostLike that = (PostLike) other;
+        return Objects.equals(post, that.post);
     }
 
     @Override
     public int hashCode() {
-        // Not using post field to avoid infinite recursion
-        return super.hashCode();
+        return Objects.hash(super.hashCode(), post);
     }
 
     @Override
