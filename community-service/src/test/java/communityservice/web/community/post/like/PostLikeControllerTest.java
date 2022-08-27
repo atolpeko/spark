@@ -96,9 +96,9 @@ public class PostLikeControllerTest {
 
     @Test
     public void shouldDeleteLikeOnLikesDeleteRequest() throws Exception {
-        deleteByIdAndExpect(2, status().isNoContent());
+        deleteByIdAndExpect(6, status().isNoContent());
 
-        Optional<PostLike> deleted = likeService.findById(3);
+        Optional<PostLike> deleted = likeService.findById(6);
         assertThat(deleted, is(Optional.empty()));
     }
 
