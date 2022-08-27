@@ -96,90 +96,30 @@ public class UserControllerTest {
     }
 
     @Test
-    @WithMockUser(authorities = "ADMIN")
-    public void shouldReturnAllUsersOnUsersGetRequestWhenUserIsAdmin() throws Exception {
-        getAllAndExpect(status().isOk());
-    }
-
-    private void getAllAndExpect(ResultMatcher status) throws Exception {
+    @WithAnonymousUser
+    public void shouldReturnAllUsersOnUsersGetRequest() throws Exception {
         mvc.perform(get("/users"))
                 .andDo(print())
-                .andExpect(status)
+                .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON));
     }
 
     @Test
-    @WithMockUser(authorities = "USER")
-    public void shouldDenyAccessToAllUsersWhenUserIsNotAdmin() throws Exception {
-        getAllAndExpect(status().isUnauthorized());
-    }
-
-    @Test
     @WithAnonymousUser
-    public void shouldDenyAccessToAllUsersWhenUserIsNotAuthenticated() throws Exception {
-        getAllAndExpect(status().isUnauthorized());
-    }
-
-    @Test
-    @WithMockUser(authorities = "ADMIN")
-    public void shouldReturnUserOnUserGetByLoginRequestWhenUserIsAdmin() throws Exception {
-        getByLoginAndExpect(status().isOk());
-    }
-
-    private void getByLoginAndExpect(ResultMatcher status) throws Exception {
+    public void shouldReturnUserOnUserGetByLoginRequest() throws Exception {
         mvc.perform(get("/users").param("login", "log"))
                 .andDo(print())
-                .andExpect(status)
+                .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON));
     }
 
     @Test
-    @WithMockUser(username = "log", authorities = "USER")
-    public void shouldReturnUserOnUsersGetByLoginRequestWhenUserIsResourceOwner() throws Exception {
-        getByLoginAndExpect(status().isOk());
-    }
-
-    @Test
-    @WithMockUser(username = "log2", authorities = "USER")
-    public void shouldDenyAccessToUserByLoginWhenUserIsNotResourceOwner() throws Exception {
-        getByLoginAndExpect(status().isUnauthorized());
-    }
-
-    @Test
     @WithAnonymousUser
-    public void shouldDenyAccessToUserByLoginWhenUserIsNotAuthenticated() throws Exception {
-        getByLoginAndExpect(status().isUnauthorized());
-    }
-
-    @Test
-    @WithMockUser(authorities = "ADMIN")
-    public void shouldReturnUserOnUserGetByEmailRequestWhenUserIsAdmin() throws Exception {
-        getByEmailAndExpect(status().isOk());
-    }
-
-    private void getByEmailAndExpect(ResultMatcher status) throws Exception {
+    public void shouldReturnUserOnUserGetByEmailRequest() throws Exception {
         mvc.perform(get("/users").param("email", "e@gmail.com"))
                 .andDo(print())
-                .andExpect(status)
+                .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON));
-    }
-
-    @Test
-    @WithMockUser(username = "log", authorities = "USER")
-    public void shouldReturnUserOnUsersGetByEmailRequestWhenUserIsResourceOwner() throws Exception {
-        getByEmailAndExpect(status().isOk());
-    }
-
-    @Test
-    @WithMockUser(username = "log2", authorities = "USER")
-    public void shouldDenyAccessToUserByEmailWhenUserIsNotResourceOwner() throws Exception {
-        getByEmailAndExpect(status().isUnauthorized());
-    }
-
-    @Test
-    @WithAnonymousUser
-    public void shouldDenyAccessToUserByEmailWhenUserIsNotAuthenticated() throws Exception {
-        getByEmailAndExpect(status().isUnauthorized());
     }
 
     @Test

@@ -69,6 +69,8 @@ public class ResourceServerConfiguration extends ResourceServerConfigurerAdapter
                 .mvcMatchers("/**")
             .and()
             .authorizeRequests()
+                .mvcMatchers(HttpMethod.GET,"/users/**")
+                    .permitAll()
                 .mvcMatchers(HttpMethod.POST,"/users/**")
                     .permitAll()
                 .mvcMatchers("/users/**")
