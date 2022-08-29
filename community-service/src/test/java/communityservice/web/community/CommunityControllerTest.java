@@ -28,6 +28,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
+import org.springframework.security.test.context.support.WithAnonymousUser;
+import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultMatcher;
@@ -52,8 +54,10 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @ContextConfiguration(classes = IntegrationTestConfig.class)
 @AutoConfigureMockMvc
 public class CommunityControllerTest {
-    private static String newCommunityJson;
-    private static String updatedCommunityJson;
+    private static String newCommunity1Json;
+    private static String newCommunity2Json;
+    private static String updatedCommunity1Json;
+    private static String updatedCommunity2Json;
 
     @Autowired
     private MockMvc mvc;
@@ -62,23 +66,33 @@ public class CommunityControllerTest {
     private CommunityService communityService;
 
     @BeforeAll
-    public static void createNewCommunityJson() {
-        newCommunityJson = "{" +
+    public static void createNewCommunityJsons() {
+        newCommunity1Json = "{" +
                 "\"name\": \"new-name\"," +
                 "\"description\": \"new-description\"," +
+                "\"adminLogin\" : \"login1\"" +
+                "}";
+        newCommunity2Json = "{" +
+                "\"name\": \"new-name2\"," +
+                "\"description\": \"new-description2\"," +
                 "\"adminLogin\" : \"login1\"" +
                 "}";
     }
 
     @BeforeAll
-    private static void createUpdatedCommunityJson() {
-        updatedCommunityJson = "{" +
+    private static void createUpdatedCommunityJsons() {
+        updatedCommunity1Json = "{" +
                 "\"name\": \"updated-name\"," +
                 "\"description\": \"updated-description\"" +
+                "}";
+        updatedCommunity2Json = "{" +
+                "\"name\": \"updated-name2\"," +
+                "\"description\": \"updated-description2\"" +
                 "}";
     }
 
     @Test
+    @WithAnonymousUser
     public void shouldReturnAllCommunitiesOnCommunitiesGetRequest() throws Exception {
         mvc.perform(get("/communities"))
                 .andDo(print())
@@ -87,6 +101,7 @@ public class CommunityControllerTest {
     }
 
     @Test
+    @WithAnonymousUser
     public void shouldReturnCommunityOnCommunityGetByIdRequest() throws Exception {
         mvc.perform(get("/communities/1"))
                 .andDo(print())
@@ -95,6 +110,7 @@ public class CommunityControllerTest {
     }
 
     @Test
+    @WithAnonymousUser
     public void shouldReturnCommunityOnCommunityGetByNameRequest() throws Exception {
         mvc.perform(get("/communities").param("name", "name1"))
                 .andDo(print())
@@ -103,9 +119,10 @@ public class CommunityControllerTest {
     }
 
     @Test
-    public void shouldReturnSavedCommunityOnCommunitiesPostRequest() throws Exception {
+    @WithMockUser(authorities = "ADMIN")
+    public void shouldReturnSavedCommunityOnCommunitiesPostRequestWhenUserIsAdmin() throws Exception {
         int initialCount = communityService.findAll().size();
-        postAndExpect(newCommunityJson, status().isCreated());
+        postAndExpect(newCommunity1Json, status().isCreated());
 
         int newCount = communityService.findAll().size();
         assertThat(newCount, is(initialCount + 1));
@@ -122,9 +139,32 @@ public class CommunityControllerTest {
     }
 
     @Test
-    public void shouldReturnUpdatedCommunityOnCommunitiesPatchRequest() throws Exception {
+    @WithMockUser(authorities = "USER", username = "login1")
+    public void shouldReturnSavedCommunityOnCommunitiesPostRequestWhenUserIsResourceOwner() throws Exception {
+        int initialCount = communityService.findAll().size();
+        postAndExpect(newCommunity2Json, status().isCreated());
+
+        int newCount = communityService.findAll().size();
+        assertThat(newCount, is(initialCount + 1));
+    }
+
+    @Test
+    @WithMockUser(authorities = "USER", username = "login2")
+    public void shouldDenyPostingOnCommunitiesPostRequestWhenUserIsNotResourceOwner() throws Exception {
+        postAndExpect(newCommunity1Json, status().isUnauthorized());
+    }
+
+    @Test
+    @WithAnonymousUser
+    public void shouldDenyPostingOnCommunitiesPostRequestWhenUserIsAnonymous() throws Exception {
+        postAndExpect(newCommunity1Json, status().isUnauthorized());
+    }
+
+    @Test
+    @WithMockUser(authorities = "ADMIN")
+    public void shouldReturnUpdatedCommunityOnCommunitiesPatchRequestWhenUserIsAdmin() throws Exception {
         Community initial = communityService.findById(2).orElseThrow();
-        patchByIdAndExpect(2, updatedCommunityJson, status().isOk());
+        patchByIdAndExpect(2, updatedCommunity1Json, status().isOk());
 
         Community updated = communityService.findById(2).orElseThrow();
         assertThat(updated, is(not(equalTo(initial))));
@@ -141,10 +181,42 @@ public class CommunityControllerTest {
     }
 
     @Test
-    public void shouldDeleteCommunityOnCommunitiesDeleteRequest() throws Exception {
-        deleteByIdAndExpect(3, status().isNoContent());
+    @WithMockUser(authorities = "USER", username = "login2")
+    public void shouldReturnUpdatedCommunityOnCommunitiesPatchRequestWhenUserIsResourceOwner() throws Exception {
+        Community initial = communityService.findById(3).orElseThrow();
+        patchByIdAndExpect(3, updatedCommunity2Json, status().isOk());
 
-        Optional<Community> deleted = communityService.findById(3);
+        Community updated = communityService.findById(3).orElseThrow();
+        assertThat(updated, is(not(equalTo(initial))));
+    }
+
+    @Test
+    @WithMockUser(authorities = "USER", username = "login2")
+    public void shouldDenyPatchingOnCommunitiesPatchRequestWhenUserIsNotResourceOwner() throws Exception {
+        patchByIdAndExpect(2, updatedCommunity1Json, status().isUnauthorized());
+    }
+
+    @Test
+    @WithAnonymousUser
+    public void shouldDenyPatchingOnCommunitiesPatchRequestWhenUserIsAnonymous() throws Exception {
+        patchByIdAndExpect(2, updatedCommunity1Json, status().isUnauthorized());
+    }
+
+    @Test
+    @WithMockUser(authorities = "ADMIN")
+    public void shouldDeleteCommunityOnCommunitiesDeleteRequestWhenUserIsAdmin() throws Exception {
+        deleteByIdAndExpect(4, status().isNoContent());
+
+        Optional<Community> deleted = communityService.findById(4);
+        assertThat(deleted, is(Optional.empty()));
+    }
+
+    @Test
+    @WithMockUser(authorities = "USER", username = "login3")
+    public void shouldDeleteCommunityOnCommunitiesDeleteRequestWhenUserIsResourceOwner() throws Exception {
+        deleteByIdAndExpect(5, status().isNoContent());
+
+        Optional<Community> deleted = communityService.findById(5);
         assertThat(deleted, is(Optional.empty()));
     }
 
@@ -152,5 +224,17 @@ public class CommunityControllerTest {
         mvc.perform(delete("/communities/" + id))
                 .andDo(print())
                 .andExpect(status);
+    }
+
+    @Test
+    @WithMockUser(authorities = "USER", username = "login1")
+    public void shouldDenyDeletionOnCommunitiesDeleteRequestWhenUserIsNotResourceOwner() throws Exception {
+        deleteByIdAndExpect(3, status().isUnauthorized());
+    }
+
+    @Test
+    @WithAnonymousUser
+    public void shouldDenyDeletionOnCommunitiesDeleteRequestWhenUserIsAnonymous() throws Exception {
+        deleteByIdAndExpect(3, status().isUnauthorized());
     }
 }

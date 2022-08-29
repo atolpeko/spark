@@ -23,6 +23,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.hateoas.CollectionModel;
 import org.springframework.hateoas.EntityModel;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -76,12 +77,15 @@ public class CommunityController {
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
+    @PreAuthorize("hasAuthority('USER') and #community.adminLogin == authentication.name" +
+            " or hasAuthority('ADMIN')")
     public EntityModel<Community> post(@RequestBody @Valid Community community) {
         Community saved = communityService.save(community);
         return modelAssembler.toModel(saved);
     }
 
     @PatchMapping("/{id}")
+    @PreAuthorize("@communityAccessHandler.canPatch(#id)")
     public EntityModel<Community> patchById(@PathVariable Long id,
                                             @RequestBody Community community) {
         community.setId(id);
@@ -91,6 +95,7 @@ public class CommunityController {
 
     @DeleteMapping("/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
+    @PreAuthorize("@communityAccessHandler.canDelete(#id)")
     public void deleteById(@PathVariable Long id) {
         communityService.deleteById(id);
     }
