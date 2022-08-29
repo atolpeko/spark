@@ -18,6 +18,8 @@ package communityservice.service.community;
 
 import communityservice.data.CommunityRepository;
 import communityservice.service.exception.IllegalModificationException;
+import communityservice.service.user.User;
+import communityservice.service.user.UserServiceFeignClient;
 
 import io.github.resilience4j.circuitbreaker.CircuitBreaker;
 
@@ -50,6 +52,7 @@ import static org.mockito.Mockito.when;
 @Tag("category.UnitTest")
 public class CommunityServiceImplTest {
     private static CommunityRepository communityRepository;
+    private static UserServiceFeignClient feignClient;
     private static Validator validator;
     private static CircuitBreaker circuitBreaker;
 
@@ -63,6 +66,12 @@ public class CommunityServiceImplTest {
         communityRepository = mock(CommunityRepository.class);
         validator = mock(Validator.class);
 
+        feignClient = mock(UserServiceFeignClient.class);
+        User user = User.builder()
+                .withLogin("login")
+                .build();
+        when(feignClient.findUserByLogin("login")).thenReturn(user);
+
         circuitBreaker = mock(CircuitBreaker.class);
         when(circuitBreaker.decorateSupplier(any())).then(returnsFirstArg());
         when(circuitBreaker.decorateRunnable(any())).then(returnsFirstArg());
@@ -73,6 +82,7 @@ public class CommunityServiceImplTest {
         community = Community.builder()
                 .withId(1L)
                 .withName("name")
+                .withAdminLogin("login")
                 .withDescription("desc")
                 .build();
     }
@@ -89,7 +99,8 @@ public class CommunityServiceImplTest {
     @BeforeEach
     public void beforeEach() {
         Mockito.reset(communityRepository, validator);
-        communityService = new CommunityServiceImpl(communityRepository, validator, circuitBreaker);
+        communityService = new CommunityServiceImpl(communityRepository,
+                feignClient, validator, circuitBreaker);
     }
 
     @Test

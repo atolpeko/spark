@@ -16,6 +16,8 @@
 
 package communityservice.service.community;
 
+import communityservice.service.user.User;
+
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
@@ -39,6 +41,7 @@ public class CommunityTest {
     public void shouldPassValidationWhenHasValidData() {
         Community community = Community.builder()
                 .withName("Name")
+                .withAdminLogin("login")
                 .withDescription("Description")
                 .build();
 
@@ -48,9 +51,10 @@ public class CommunityTest {
 
     @Test
     public void shouldNotPassValidationWhenHasInvalidData() {
-        Community community = new Community();
+        Community community = Community.builder()
+                .build();
 
         int errors = validator.validate(community).size();
-        assertThat(errors, is(2));
+        assertThat(errors, is(3));
     }
 }

@@ -22,7 +22,9 @@ import communityservice.web.community.user.UserController;
 
 import org.springframework.hateoas.CollectionModel;
 import org.springframework.hateoas.EntityModel;
+import org.springframework.hateoas.Link;
 import org.springframework.hateoas.server.RepresentationModelAssembler;
+import org.springframework.hateoas.server.mvc.BasicLinkBuilder;
 import org.springframework.stereotype.Component;
 
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
@@ -37,8 +39,13 @@ public class CommunityModelAssembler
 
     @Override
     public EntityModel<Community> toModel(Community entity) {
+        Link adminRef = BasicLinkBuilder
+                .linkToCurrentMapping()
+                .slash("/users?login=" + entity.getAdminLogin())
+                .withRel("admin");
+
         long id = entity.getId();
-        return EntityModel.of(entity,
+        return EntityModel.of(entity, adminRef,
                 linkTo(methodOn(UserController.class).getAll(id)).withRel("users"),
                 linkTo(methodOn(PostController.class).getAll(id)).withRel("posts"),
                 linkTo(methodOn(CommunityController.class).getById(id)).withSelfRel(),

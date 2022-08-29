@@ -17,8 +17,14 @@
 package communityservice.service.community;
 
 import communityservice.data.CommunityRepository;
+import communityservice.data.UserRepository;
 import communityservice.service.exception.IllegalModificationException;
 import communityservice.service.exception.RemoteResourceException;
+
+import communityservice.service.user.User;
+import communityservice.service.user.UserServiceFeignClient;
+
+import feign.FeignException;
 
 import io.github.resilience4j.circuitbreaker.CircuitBreaker;
 
@@ -28,6 +34,7 @@ import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.dao.EmptyResultDataAccessException;
+import org.springframework.security.oauth2.client.resource.OAuth2AccessDeniedException;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
@@ -47,14 +54,17 @@ public class CommunityServiceImpl implements CommunityService {
     private static final Logger logger = LogManager.getLogger(CommunityServiceImpl.class);
 
     private final CommunityRepository repository;
+    private final UserServiceFeignClient userService;
     private final Validator validator;
     private final CircuitBreaker circuitBreaker;
 
     @Autowired
     public CommunityServiceImpl(CommunityRepository repository,
+                                UserServiceFeignClient userService,
                                 Validator validator,
                                 CircuitBreaker circuitBreaker) {
         this.repository = repository;
+        this.userService = userService;
         this.validator = validator;
         this.circuitBreaker = circuitBreaker;
     }
@@ -109,7 +119,19 @@ public class CommunityServiceImpl implements CommunityService {
         }
     }
 
+    private Community prepareSaveData(Community community) {
+        Community communityToSave = new Community(community);
+        communityToSave.setId(null);
+
+        return communityToSave;
+    }
+
     private void validate(Community community) {
+        validateCommunity(community);
+        checkUserExistence(community.getAdminLogin());
+    }
+
+    private void validateCommunity(Community community) {
         Set<ConstraintViolation<Community>> violations = validator.validate(community);
         if (!violations.isEmpty()) {
             StringBuilder builder = new StringBuilder();
@@ -123,11 +145,19 @@ public class CommunityServiceImpl implements CommunityService {
         }
     }
 
-    private Community prepareSaveData(Community community) {
-        Community communityToSave = new Community(community);
-        communityToSave.setId(null);
-
-        return communityToSave;
+    private void checkUserExistence(String login) {
+        try {
+            Supplier<User> findUser = () -> userService.findUserByLogin(login);
+            circuitBreaker.decorateSupplier(findUser).get();
+        } catch (FeignException e) {
+            if (e.status() == 404) {
+                throw new IllegalModificationException("User not found: " + login);
+            } else {
+                throw new RemoteResourceException("User microservice unavailable: " + e.getMessage());
+            }
+        } catch (OAuth2AccessDeniedException e) {
+            throw new RemoteResourceException("Auth service unavailable: " + e.getMessage());
+        }
     }
 
     private Community persistCommunity(Community community) {

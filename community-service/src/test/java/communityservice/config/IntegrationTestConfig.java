@@ -18,6 +18,8 @@ package communityservice.config;
 
 import communityservice.data.CommunityRepository;
 import communityservice.data.UserRepository;
+import communityservice.service.community.CommunityService;
+import communityservice.service.community.CommunityServiceImpl;
 import communityservice.service.user.User;
 import communityservice.service.user.UserService;
 import communityservice.service.user.UserServiceFeignClient;
@@ -54,6 +56,13 @@ public class IntegrationTestConfig {
     @Primary
     public UserService userService() {
         return new UserServiceImpl(communityRepository, userRepository,
+                userServiceFeignClient(), validator, circuitBreaker);
+    }
+
+    @Bean
+    @Primary
+    public CommunityService communityService() {
+        return new CommunityServiceImpl(communityRepository,
                 userServiceFeignClient(), validator, circuitBreaker);
     }
 
