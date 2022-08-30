@@ -25,6 +25,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.hateoas.CollectionModel;
 import org.springframework.hateoas.EntityModel;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -78,6 +79,7 @@ public class PostController {
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
+    @PreAuthorize("#post.user.login == authentication.name")
     public EntityModel<Post> post(@PathVariable Long communityId,
                                   @RequestBody Post post) {
         Post saved = postService.save(post, communityId);
@@ -85,6 +87,7 @@ public class PostController {
     }
 
     @PatchMapping("{postId}")
+    @PreAuthorize("@postAccessHandler.canPatch(#postId)")
     public EntityModel<Post> patchById(@PathVariable Long communityId,
                                        @PathVariable Long postId,
                                        @RequestBody Post post) {
@@ -96,6 +99,7 @@ public class PostController {
 
     @DeleteMapping("/{postId}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
+    @PreAuthorize("@postAccessHandler.canDelete(#postId)")
     public void deleteById(@PathVariable Long communityId,
                            @PathVariable Long postId) {
         checkCommunityExistence(communityId);

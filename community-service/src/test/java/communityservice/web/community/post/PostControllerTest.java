@@ -27,6 +27,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
+import org.springframework.security.test.context.support.WithAnonymousUser;
+import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultMatcher;
 
@@ -72,6 +74,7 @@ public class PostControllerTest {
     }
 
     @Test
+    @WithAnonymousUser
     public void shouldReturnAllPostsOnPostsGetRequest() throws Exception {
         mvc.perform(get("/communities/1/posts"))
                 .andDo(print())
@@ -80,6 +83,7 @@ public class PostControllerTest {
     }
 
     @Test
+    @WithAnonymousUser
     public void shouldReturnPostOnPostGetByIdRequest() throws Exception {
         mvc.perform(get("/communities/1/posts/1"))
                 .andDo(print())
@@ -88,7 +92,8 @@ public class PostControllerTest {
     }
 
     @Test
-    public void shouldReturnSavedPostsOnPostsPostRequest() throws Exception {
+    @WithMockUser(username = "login1")
+    public void shouldReturnSavedPostsOnPostsPostRequestWhenUserIsResourceOwner() throws Exception {
         int initialCount = postService.findAllByCommunityId(1).size();
         postAndExpect(newPostJson, status().isCreated());
 
@@ -107,7 +112,20 @@ public class PostControllerTest {
     }
 
     @Test
-    public void shouldReturnUpdatedPostOnPostsPatchRequest() throws Exception {
+    @WithMockUser(username = "login2")
+    public void shouldDenyPostingOnPostsPostRequestWhenUserIsNotResourceOwner() throws Exception {
+        postAndExpect(newPostJson, status().isUnauthorized());
+    }
+
+    @Test
+    @WithAnonymousUser
+    public void shouldDenyPostingOnPostsPostRequestWhenUserIsNotAuthenticated() throws Exception {
+        postAndExpect(newPostJson, status().isUnauthorized());
+    }
+
+    @Test
+    @WithMockUser(username = "login1")
+    public void shouldReturnUpdatedPostOnPostsPatchRequestWhenUserIsResourceOwner() throws Exception {
         Post initial = postService.findById(2).orElseThrow();
         patchByIdAndExpect(2, updatedPostJson, status().isOk());
 
@@ -126,7 +144,20 @@ public class PostControllerTest {
     }
 
     @Test
-    public void shouldDeletePostOnPostsDeleteRequest() throws Exception {
+    @WithMockUser(username = "login2")
+    public void shouldDenyPatchingOnPostsPatchRequestWhenUserIsNotResourceOwner() throws Exception {
+        patchByIdAndExpect(2, updatedPostJson, status().isUnauthorized());
+    }
+
+    @Test
+    @WithAnonymousUser
+    public void shouldDenyPatchingOnPostsPatchRequestWhenUserIsNotAuthenticated() throws Exception {
+        patchByIdAndExpect(2, updatedPostJson, status().isUnauthorized());
+    }
+
+    @Test
+    @WithMockUser(username = "login2")
+    public void shouldDeletePostOnPostDeleteRequestWhenUserIsResourceOwner() throws Exception {
         deleteByIdAndExpect(3, status().isNoContent());
 
         Optional<Post> deleted = postService.findById(3);
@@ -137,5 +168,17 @@ public class PostControllerTest {
         mvc.perform(delete("/communities/2/posts/" + id))
                 .andDo(print())
                 .andExpect(status);
+    }
+
+    @Test
+    @WithMockUser(username = "login1")
+    public void shouldDenyDeletionOnPostDeleteRequestWhenUserIsNotResourceOwner() throws Exception {
+        deleteByIdAndExpect(3, status().isUnauthorized());
+    }
+
+    @Test
+    @WithAnonymousUser
+    public void shouldDenyDeletionOnPostDeleteRequestWhenUserIsNotAuthenticated() throws Exception {
+        deleteByIdAndExpect(3, status().isUnauthorized());
     }
 }
