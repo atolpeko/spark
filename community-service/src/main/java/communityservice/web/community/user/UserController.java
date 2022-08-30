@@ -23,6 +23,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.hateoas.CollectionModel;
 import org.springframework.hateoas.EntityModel;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -60,6 +61,7 @@ public class UserController {
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
+    @PreAuthorize("#user.login == authentication.name")
     public EntityModel<User> subscribe(@PathVariable Long communityId,
                                        @RequestBody @Valid User user) {
         User saved = userService.subscribeUser(communityId, user);
@@ -68,6 +70,7 @@ public class UserController {
 
     @DeleteMapping(params = "login")
     @ResponseStatus(HttpStatus.NO_CONTENT)
+    @PreAuthorize("#login == authentication.name")
     public void unsubscribe(@PathVariable Long communityId,
                             @RequestParam String login) {
         userService.unsubscribeUser(communityId, login);

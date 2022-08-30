@@ -27,6 +27,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
+import org.springframework.security.test.context.support.WithAnonymousUser;
+import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultMatcher;
@@ -60,6 +62,7 @@ public class UserControllerTest {
     }
 
     @Test
+    @WithAnonymousUser
     public void shouldReturnAllUsersOnUsersGetRequest() throws Exception {
         mvc.perform(get("/communities/1/users"))
                 .andDo(print())
@@ -68,6 +71,7 @@ public class UserControllerTest {
     }
 
     @Test
+    @WithAnonymousUser
     public void shouldReturnUserOnUserGetByLoginRequest() throws Exception {
         mvc.perform(get("/communities/1/users").param("login", "login1"))
                 .andDo(print())
@@ -76,7 +80,8 @@ public class UserControllerTest {
     }
 
     @Test
-    public void shouldSubscribeUserToCommunityOnUsersPostRequest() throws Exception {
+    @WithMockUser(username = "new-login")
+    public void shouldSubscribeUserToCommunityOnUsersPostRequestWhenUserIsResourceOwner() throws Exception {
         int usersCount = userService.findAllByCommunityId(1L).size();
         postAndExpect(userJson, status().isCreated());
 
@@ -95,17 +100,36 @@ public class UserControllerTest {
     }
 
     @Test
-    public void shouldUnsubscribeUserFromCommunityOnUsersDeleteRequest() throws Exception {
-        int userCount = userService.findAllByCommunityId(2L).size();
+    @WithAnonymousUser
+    public void shouldDenySubscriptionOnUsersPostRequestWhenUserIsAnonymous() throws Exception {
+        postAndExpect(userJson, status().isUnauthorized());
+    }
+
+    @Test
+    @WithMockUser(username = "login2")
+    public void shouldUnsubscribeUserFromCommunityOnUserDeleteRequestWhenUserIsResourceOwner() throws Exception {
+        int userCount = userService.findAllByCommunityId(1L).size();
         deleteByLoginAndExpect("login2", status().isNoContent());
 
-        int newCount = userService.findAllByCommunityId(2L).size();
+        int newCount = userService.findAllByCommunityId(1L).size();
         assertThat(newCount, is(userCount - 1));
     }
 
     private void deleteByLoginAndExpect(String login, ResultMatcher status) throws Exception {
-        mvc.perform(delete("/communities/2/users").param("login", login))
+        mvc.perform(delete("/communities/1/users").param("login", login))
                 .andDo(print())
                 .andExpect(status);
+    }
+
+    @Test
+    @WithMockUser(authorities = "USER", username = "login1")
+    public void shouldDenyUnsubscriptionOnUserDeleteRequestWhenUserIsNotResourceOwner() throws Exception {
+        deleteByLoginAndExpect("login2", status().isUnauthorized());
+    }
+
+    @Test
+    @WithAnonymousUser
+    public void shouldDenyUnsubscriptionOnUserDeleteRequestWhenUserIsAnonymous() throws Exception {
+        deleteByLoginAndExpect("login2", status().isUnauthorized());
     }
 }
