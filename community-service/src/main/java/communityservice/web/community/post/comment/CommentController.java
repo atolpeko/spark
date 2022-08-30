@@ -25,6 +25,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.hateoas.CollectionModel;
 import org.springframework.hateoas.EntityModel;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -91,6 +92,7 @@ public class CommentController {
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
+    @PreAuthorize("#comment.user.login == authentication.name")
     public EntityModel<Comment> post(@PathVariable Long communityId,
                                      @PathVariable Long postId,
                                      @RequestBody Comment comment) {
@@ -100,6 +102,7 @@ public class CommentController {
     }
 
     @PatchMapping("/{commentId}")
+    @PreAuthorize("@commentAccessHandler.canPatch(#commentId)")
     public EntityModel<Comment> patch(@PathVariable Long communityId,
                                       @PathVariable Long postId,
                                       @PathVariable Long commentId,
@@ -113,6 +116,7 @@ public class CommentController {
 
     @DeleteMapping("/{commentId}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
+    @PreAuthorize("@commentAccessHandler.canDelete(#commentId)")
     public void deleteById(@PathVariable Long communityId,
                            @PathVariable Long postId,
                            @PathVariable Long commentId) {

@@ -27,6 +27,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
+import org.springframework.security.test.context.support.WithAnonymousUser;
+import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultMatcher;
 
@@ -72,6 +74,7 @@ public class CommentControllerTest {
     }
 
     @Test
+    @WithAnonymousUser
     public void shouldReturnAllCommentsOnCommentsGetRequest() throws Exception {
         mvc.perform(get("/communities/1/posts/1/comments"))
                 .andDo(print())
@@ -80,6 +83,7 @@ public class CommentControllerTest {
     }
 
     @Test
+    @WithAnonymousUser
     public void shouldReturnCommentOnCommentGetByIdRequest() throws Exception {
         mvc.perform(get("/communities/1/posts/1/comments/1"))
                 .andDo(print())
@@ -88,7 +92,8 @@ public class CommentControllerTest {
     }
 
     @Test
-    public void shouldReturnSavedCommentOnCommentsPostRequest() throws Exception {
+    @WithMockUser(username = "login1")
+    public void shouldReturnSavedCommentOnCommentsPostRequestWhenUserIsResourceOwner() throws Exception {
         int initialCount = commentService.findAllByPostId(1).size();
         postAndExpect(newCommentJson, status().isCreated());
 
@@ -107,7 +112,20 @@ public class CommentControllerTest {
     }
 
     @Test
-    public void shouldReturnUpdatedCommentOnCommentsPatchRequest() throws Exception {
+    @WithMockUser(username = "login2")
+    public void shouldDenyPostingOnCommentsPostRequestWhenUserIsNotResourceOwner() throws Exception {
+        postAndExpect(newCommentJson, status().isUnauthorized());
+    }
+
+    @Test
+    @WithAnonymousUser
+    public void shouldDenyPostingOnCommentsPostRequestWhenUserIsNotAuthenticated() throws Exception {
+        postAndExpect(newCommentJson, status().isUnauthorized());
+    }
+
+    @Test
+    @WithMockUser(username = "login1")
+    public void shouldReturnUpdatedCommentOnCommentPatchRequestWhenUserIsResourceOwner() throws Exception {
         Comment initial = commentService.findById(2).orElseThrow();
         patchByIdAndExpect(2, updatedCommentJson, status().isOk());
 
@@ -126,7 +144,21 @@ public class CommentControllerTest {
     }
 
     @Test
-    public void shouldDeleteCommentOnCommentsDeleteRequest() throws Exception {
+    @WithMockUser(username = "login2")
+    public void shouldDenyPatchingOnCommentPatchRequestWhenUserIsNotResourceOwner() throws Exception {
+        patchByIdAndExpect(2, updatedCommentJson, status().isUnauthorized());
+    }
+
+
+    @Test
+    @WithAnonymousUser
+    public void shouldDenyPatchingOnCommentPatchRequestWhenUserIsNotAuthenticated() throws Exception {
+        patchByIdAndExpect(2, updatedCommentJson, status().isUnauthorized());
+    }
+
+    @Test
+    @WithMockUser(username = "login2")
+    public void shouldDeleteCommentOnCommentsDeleteRequestWhenUserIsResourceOwner() throws Exception {
         deleteByIdAndExpect(3, status().isNoContent());
 
         Optional<Comment> deleted = commentService.findById(3);
@@ -137,5 +169,17 @@ public class CommentControllerTest {
         mvc.perform(delete("/communities/1/posts/2/comments/" + id))
                 .andDo(print())
                 .andExpect(status);
+    }
+
+    @Test
+    @WithMockUser(username = "login1")
+    public void shouldDenyDeletionOnCommentsDeleteRequestWhenUserIsNotResourceOwner() throws Exception {
+        deleteByIdAndExpect(3, status().isUnauthorized());
+    }
+
+    @Test
+    @WithAnonymousUser
+    public void shouldDenyDeletionOnCommentsDeleteRequestWhenUserIsNotAuthenticated() throws Exception {
+        deleteByIdAndExpect(3, status().isUnauthorized());
     }
 }
