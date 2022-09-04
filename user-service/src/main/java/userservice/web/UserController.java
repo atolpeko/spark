@@ -20,7 +20,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.hateoas.CollectionModel;
 import org.springframework.hateoas.EntityModel;
 import org.springframework.http.HttpStatus;
-import org.springframework.security.access.prepost.PostAuthorize;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
@@ -29,7 +28,6 @@ import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
-import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -107,26 +105,26 @@ public class UserController {
         return modelAssembler.toModel(saved);
     }
 
-    @PatchMapping("/{login}")
+    @PatchMapping(params = "login")
     @PreAuthorize("hasAuthority('USER') and #login == authentication.name or hasAuthority('ADMIN')")
-    public EntityModel<User> patchByLogin(@PathVariable String login,
+    public EntityModel<User> patchByLogin(@RequestParam String login,
                                           @RequestBody User user) {
         user.setLogin(login);
         User updated = userService.update(user);
         return modelAssembler.toModel(updated);
     }
 
-    @PatchMapping(value = "/{login}", params = "isBlocked")
+    @PatchMapping(value = "/block", params = "login")
     @PreAuthorize("hasAuthority('ADMIN')")
-    public void blockByLogin(@PathVariable String login,
+    public void blockByLogin(@RequestParam String login,
                              @RequestParam Boolean isBlocked) {
         userService.setBlockedByLogin(login, isBlocked);
     }
 
-    @DeleteMapping("{login}")
+    @DeleteMapping(params = "login")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     @PreAuthorize("hasAuthority('USER') and #login == authentication.name or hasAuthority('ADMIN')")
-    public void deleteByLogin(@PathVariable String login) {
+    public void deleteByLogin(@RequestParam String login) {
         userService.deleteByLogin(login);
     }
 }

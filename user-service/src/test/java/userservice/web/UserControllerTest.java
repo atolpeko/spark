@@ -152,7 +152,8 @@ public class UserControllerTest {
     }
 
     private void patchByLoginAndExpect(String login, String data, ResultMatcher status) throws Exception {
-        mvc.perform(patch("/users/" + login)
+        mvc.perform(patch("/users")
+                        .param("login", login)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(data)
                         .accept(MediaType.APPLICATION_JSON))
@@ -194,7 +195,9 @@ public class UserControllerTest {
     }
 
     private void blockByLoginAndExpect(String login, ResultMatcher status) throws Exception {
-        mvc.perform(patch("/users/" + login).param("isBlocked", "true"))
+        mvc.perform(patch("/users/block")
+                        .param("login", login)
+                        .param("isBlocked", "true"))
                 .andDo(print())
                 .andExpect(status);
     }
@@ -221,7 +224,7 @@ public class UserControllerTest {
     }
 
     private void deleteByLoginAndExpect(String login, ResultMatcher status) throws Exception {
-        mvc.perform(delete("/users/" + login))
+        mvc.perform(delete("/users").param("login", login))
                 .andDo(print())
                 .andExpect(status);
     }
