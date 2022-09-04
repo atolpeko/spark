@@ -71,10 +71,18 @@ public class User {
         return new User(other).new Builder();
     }
 
+    /**
+     * Constructs a new enabled user.
+     */
     public User() {
         isBlocked = false;
     }
 
+    /**
+     * Constructs a new User copying data from the passed one.
+     *
+     * @param other user to copy data from
+     */
     public User(User other) {
         login = other.login;
         password = other.password;
