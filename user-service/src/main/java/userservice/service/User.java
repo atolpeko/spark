@@ -16,6 +16,7 @@
 
 package userservice.service;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonUnwrapped;
 
 import javax.persistence.Column;
@@ -41,6 +42,7 @@ public class User {
 
     @Column(nullable = false)
     @NotBlank(message = "Password is mandatory")
+    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     private String password;
 
     @Column(name = "is_blocked", nullable = false)
