@@ -26,6 +26,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.hateoas.CollectionModel;
 import org.springframework.hateoas.EntityModel;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -103,6 +104,7 @@ public class CommentLikeController {
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
+    @PreAuthorize("#like.user.login == authentication.name")
     public EntityModel<CommentLike> like(@PathVariable Long communityId,
                                          @PathVariable Long postId,
                                          @PathVariable Long commentId,
@@ -115,6 +117,7 @@ public class CommentLikeController {
 
     @DeleteMapping("/{likeId}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
+    @PreAuthorize("@commentLikeAccessHandler.canDelete(#likeId)")
     public void dislike(@PathVariable Long communityId,
                         @PathVariable Long postId,
                         @PathVariable Long commentId,
