@@ -24,11 +24,9 @@ import org.apache.logging.log4j.Logger;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 
-import java.util.Collection;
 import java.util.Optional;
 
 @Component
@@ -66,17 +64,9 @@ public class PostLikeAccessHandler {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         if (!authentication.isAuthenticated()) {
             return false;
-        } else if (hasRole(authentication, "ADMIN")) {
-            return true;
         } else {
             String login = like.getUser().getLogin();
             return authentication.getName().equals(login);
         }
-    }
-
-    private boolean hasRole(Authentication authentication, String role) {
-        Collection<? extends GrantedAuthority> authorities = authentication.getAuthorities();
-        return authorities.stream()
-                .anyMatch(authority -> authority.getAuthority().equals(role));
     }
 }
