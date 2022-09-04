@@ -30,6 +30,13 @@ import java.util.List;
 @Repository
 public interface PostRepository extends JpaRepository<Post, Long> {
 
+    /**
+     * Retrieves all posts with the same community ID.
+     *
+     * @param communityId ID of the community with posts to get
+     *
+     * @return all posts with the same community ID
+     */
     @Query("FROM Post WHERE community.id = ?1")
     List<Post> findAllByCommunityId(long communityId);
 }

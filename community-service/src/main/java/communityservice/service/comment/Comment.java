@@ -100,6 +100,11 @@ public class Comment implements Comparable<Comment> {
         likes = new TreeSet<>();
     }
 
+    /**
+     * Constructs a new Comment copying data from the passed one.
+     *
+     * @param other comment to copy data from
+     */
     public Comment(Comment other) {
         id = other.id;
         message = other.message;

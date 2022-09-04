@@ -63,6 +63,11 @@ public class PostLike extends AbstractLike {
     public PostLike() {
     }
 
+    /**
+     * Constructs a new PostLike copying data from the passed one.
+     *
+     * @param other like to copy data from
+     */
     public PostLike(PostLike other) {
         super(other);
         post = other.post;

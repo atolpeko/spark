@@ -65,6 +65,11 @@ public abstract class AbstractLike implements Comparable<AbstractLike> {
         createdAt = LocalDateTime.now();
     }
 
+    /**
+     * Constructs a new AbstractLike copying data from the passed one.
+     *
+     * @param other like to copy data from
+     */
     public AbstractLike(AbstractLike other) {
         id = other.id;
         createdAt = other.createdAt;

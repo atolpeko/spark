@@ -107,6 +107,11 @@ public class Post implements Comparable<Post> {
         comments = new TreeSet<>();
     }
 
+    /**
+     * Constructs a new Post copying data from the passed one.
+     *
+     * @param other post to copy data from
+     */
     public Post(Post other) {
         id = other.id;
         message = other.message;

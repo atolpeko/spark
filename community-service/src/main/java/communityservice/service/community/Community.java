@@ -105,6 +105,11 @@ public class Community implements Comparable<Community> {
         createdAt = LocalDateTime.now();
     }
 
+    /**
+     * Constructs a new Community copying data from the passed one.
+     *
+     * @param other community to copy data from
+     */
     public Community(Community other) {
         id = other.id;
         name = other.name;

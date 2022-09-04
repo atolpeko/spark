@@ -77,6 +77,11 @@ public class User {
         likes = new TreeSet<>();
     }
 
+    /**
+     * Constructs a new User copying data from the passed one.
+     *
+     * @param other user to copy data from
+     */
     public User(User other) {
         login = other.login;
         communities = new TreeSet<>(other.communities);

@@ -63,6 +63,11 @@ public class CommentLike extends AbstractLike {
     public CommentLike() {
     }
 
+    /**
+     * Constructs a new CommentLike copying data from the passed one.
+     *
+     * @param other like to copy data from
+     */
     public CommentLike(CommentLike other) {
         super(other);
         comment = other.comment;
