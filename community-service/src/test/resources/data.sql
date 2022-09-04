@@ -1,4 +1,5 @@
-INSERT INTO users(login) VALUES ('login1'), ('login2'), ('login3');
+INSERT INTO users(login)
+VALUES ('login1'), ('login2'), ('login3');
 
 INSERT INTO communities(name, description, admin_login, created_at)
 VALUES ('name1', 'description1', 'login1', '2003-01-23'),

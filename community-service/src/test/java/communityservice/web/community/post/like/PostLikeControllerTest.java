@@ -27,6 +27,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
+import org.springframework.security.test.context.support.WithAnonymousUser;
+import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultMatcher;
 
@@ -60,6 +62,7 @@ public class PostLikeControllerTest {
     }
 
     @Test
+    @WithAnonymousUser
     public void shouldReturnAllLikesOnLikesGetRequest() throws Exception {
         mvc.perform(get("/communities/1/posts/1/likes"))
                 .andDo(print())
@@ -68,6 +71,7 @@ public class PostLikeControllerTest {
     }
 
     @Test
+    @WithAnonymousUser
     public void shouldReturnLikeOnLikeGetByIdRequest() throws Exception {
         mvc.perform(get("/communities/1/posts/1/likes/1"))
                 .andDo(print())
@@ -76,7 +80,8 @@ public class PostLikeControllerTest {
     }
 
     @Test
-    public void shouldReturnSavedLikeOnLikesPostRequest() throws Exception {
+    @WithMockUser(username = "login3")
+    public void shouldReturnSavedLikeOnLikesPostRequestWhenUserIsResourceOwner() throws Exception {
         int initialCount = likeService.findAllByPostId(1).size();
         postAndExpect(newLikeJson, status().isCreated());
 
@@ -95,10 +100,23 @@ public class PostLikeControllerTest {
     }
 
     @Test
-    public void shouldDeleteLikeOnLikesDeleteRequest() throws Exception {
-        deleteByIdAndExpect(6, status().isNoContent());
+    @WithMockUser(username = "login1")
+    public void shouldDenyPostingOnLikesPostRequestWhenUserIsNotResourceOwner() throws Exception {
+        postAndExpect(newLikeJson, status().isUnauthorized());
+    }
 
-        Optional<PostLike> deleted = likeService.findById(6);
+    @Test
+    @WithAnonymousUser
+    public void shouldDenyPostingOnLikesPostRequestWhenUserIsNotAuthenticated() throws Exception {
+        postAndExpect(newLikeJson, status().isUnauthorized());
+    }
+
+    @Test
+    @WithMockUser(username = "login3")
+    public void shouldDeleteLikeOnLikesDeleteRequestWhenUserIsResourceOwner() throws Exception {
+        deleteByIdAndExpect(3, status().isNoContent());
+
+        Optional<PostLike> deleted = likeService.findById(3);
         assertThat(deleted, is(Optional.empty()));
     }
 
@@ -106,5 +124,17 @@ public class PostLikeControllerTest {
         mvc.perform(delete("/communities/1/posts/2/likes/" + id))
                 .andDo(print())
                 .andExpect(status);
+    }
+
+    @Test
+    @WithMockUser(authorities = "login1")
+    public void shouldDenyDeletionOnLikesDeleteRequestWhenUserIsNotResourceOwner() throws Exception {
+        deleteByIdAndExpect(3, status().isUnauthorized());
+    }
+
+    @Test
+    @WithAnonymousUser
+    public void shouldDenyDeletionOnLikesDeleteRequestWhenUserIsNotAuthenticated() throws Exception {
+        deleteByIdAndExpect(3, status().isUnauthorized());
     }
 }
