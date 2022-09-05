@@ -4,7 +4,4 @@ MAINTAINER atolpeko <alextolpeko@gmail.com>
 ARG JAR_FILE
 COPY ${JAR_FILE} user-service.jar
 
-ARG EXPOSED_PORT
-EXPOSE ${EXPOSED_PORT}
-
 ENTRYPOINT ["java", "-jar", "/user-service.jar"]

@@ -15,10 +15,6 @@
     <name>user-service</name>
     <description>Microservice providing access to users</description>
 
-    <properties>
-        <docker.image.exposed.port>5960</docker.image.exposed.port>
-    </properties>
-
     <dependencies>
         <dependency>
             <groupId>org.springframework.boot</groupId>
