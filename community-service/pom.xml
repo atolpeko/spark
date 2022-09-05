@@ -13,11 +13,7 @@
     <packaging>jar</packaging>
 
     <name>community-service</name>
-    <description>Microservice providing access to communitiesd</description>
-
-    <properties>
-        <docker.image.exposed.port>32768</docker.image.exposed.port>
-    </properties>
+    <description>Microservice providing access to communities</description>
 
     <dependencies>
         <dependency>

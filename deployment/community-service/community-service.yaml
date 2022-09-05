@@ -1,0 +1,94 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: community-service
+  labels:
+    app: community-service
+spec:
+  selector:
+    matchLabels:
+      app: community-service
+      tier: microservice
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        app: community-service
+        tier: microservice
+    spec:
+      containers:
+      - name: community-service
+        image: atolpeko/community-service:1.0
+        ports:
+          - containerPort: 3080
+        env:
+        - name: SPRING_PROFILES_ACTIVE
+          value: prod
+        - name: SERVER_PORT
+          value: "3080"
+        - name: FEIGN_USER-SERVICE-URL 
+          value: http://user-service.default.svc.cluster.local:6060/   
+        - name: SPRING_DATASOURCE_URL
+          valueFrom:
+            secretKeyRef:
+              name: community-service-secret
+              key: db-url
+        - name: SPRING_DATASOURCE_USERNAME
+          valueFrom:
+            secretKeyRef:
+              name: community-service-secret
+              key: db-username
+        - name: SPRING_DATASOURCE_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: community-service-secret
+              key: db-password
+        - name: SPRING_SECURITY_OAUTH2_JWT-KEY
+          valueFrom:
+            secretKeyRef:
+              name: community-service-secret
+              key: jwt-key   
+        - name: SPRING_SECURITY_OAUTH2_CLIENTS__0_CLIENT-ID
+          valueFrom:
+            secretKeyRef:
+              name: community-service-secret
+              key: clients-0-id
+        - name: SPRING_SECURITY_OAUTH2_CLIENTS__0_CLIENT-SECRET
+          valueFrom:
+            secretKeyRef:
+              name: community-service-secret
+              key: clients-0-secret
+        - name: SPRING_SECURITY_OAUTH2_CLIENTS__0_AUTHORIZATION-GRANT-TYPE
+          valueFrom:
+            secretKeyRef:
+              name: community-service-secret
+              key: clients-0-grant-type
+        - name: SPRING_SECURITY_OAUTH2_CLIENTS__0_SCOPE
+          valueFrom:
+            secretKeyRef:
+              name: community-service-secret
+              key: clients-0-scope
+        - name: SPRING_SECURITY_OAUTH2_CLIENTS__0_ACCESS-TOKEN-URI
+          valueFrom:
+            secretKeyRef:
+              name: community-service-secret
+              key: clients-0-token-uri
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: community-service
+  labels:
+    app: community-service
+    tier: microservice
+spec:
+  type: NodePort
+  ports:
+    - protocol: "TCP"
+      port: 9090
+      targetPort: 3080
+  selector:
+    app: community-service 
+    tier: microservice
+    
