@@ -15,10 +15,6 @@
 	<name>auth-service</name>
 	<description>OAuth2 server</description>
 
-	<properties>
-		<docker.image.exposed.port>9000</docker.image.exposed.port>
-	</properties>
-
 	<dependencies>
 		<dependency>
 			<groupId>org.springframework.boot</groupId>

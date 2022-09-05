@@ -1,0 +1,152 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: auth-service
+  labels:
+    app: auth-service
+spec:
+  selector:
+    matchLabels:
+      app: auth-service
+      tier: microservice
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        app: auth-service
+        tier: microservice
+    spec:
+      containers:
+      - name: auth-service
+        image: atolpeko/auth-service:1.0
+        ports:
+          - containerPort: 3090
+        env:
+        - name: SPRING_PROFILES_ACTIVE
+          value: prod
+        - name: SERVER_PORT
+          value: "3090"
+        - name: SPRING_DATASOURCE_URL
+          valueFrom:
+            secretKeyRef:
+              name: auth-service-secret
+              key: db-url
+        - name: SPRING_DATASOURCE_USERNAME
+          valueFrom:
+            secretKeyRef:
+              name: auth-service-secret
+              key: db-username
+        - name: SPRING_DATASOURCE_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: auth-service-secret
+              key: db-password
+        - name: SPRING_SECURITY_OAUTH2_JWT-KEY
+          valueFrom:
+            secretKeyRef:
+              name: auth-service-secret
+              key: jwt-key   
+        - name: SPRING_SECURITY_OAUTH2_CLIENTS__0_NAME
+          valueFrom:
+            secretKeyRef:
+              name: auth-service-secret
+              key: clients-0-name  
+        - name: SPRING_SECURITY_OAUTH2_CLIENTS__0_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: auth-service-secret
+              key: clients-0-password        
+        - name: SPRING_SECURITY_OAUTH2_CLIENTS__0_GRANTTYPES__0
+          valueFrom:
+            secretKeyRef:
+              name: auth-service-secret
+              key: clients-0-grant-type
+        - name: SPRING_SECURITY_OAUTH2_CLIENTS__0_SCOPES__0
+          valueFrom:
+            secretKeyRef:
+              name: auth-service-secret
+              key: clients-0-scopes-0   
+        - name: SPRING_SECURITY_OAUTH2_CLIENTS__0_SCOPES__1
+          valueFrom:
+            secretKeyRef:
+              name: auth-service-secret
+              key: clients-0-scopes-1
+        - name: SPRING_SECURITY_OAUTH2_CLIENTS__0_ACCESSTOKENVALIDITYSECONDS
+          valueFrom:
+            secretKeyRef:
+              name: auth-service-secret
+              key: clients-0-access-token-validity 
+        - name: SPRING_SECURITY_OAUTH2_CLIENTS__0_REFRESHTOKENVALIDITYSECONDS
+          valueFrom:
+            secretKeyRef:
+              name: auth-service-secret
+              key: clients-0-refresh-token-validity     
+        - name: SPRING_SECURITY_OAUTH2_CLIENTS__1_NAME
+          valueFrom:
+            secretKeyRef:
+              name: auth-service-secret
+              key: clients-1-name  
+        - name: SPRING_SECURITY_OAUTH2_CLIENTS__1_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: auth-service-secret
+              key: clients-1-password        
+        - name: SPRING_SECURITY_OAUTH2_CLIENTS__1_GRANTTYPES__0
+          valueFrom:
+            secretKeyRef:
+              name: auth-service-secret
+              key: clients-1-grant-type
+        - name: SPRING_SECURITY_OAUTH2_CLIENTS__1_SCOPES__0
+          valueFrom:
+            secretKeyRef:
+              name: auth-service-secret
+              key: clients-1-scopes-0   
+        - name: SPRING_SECURITY_OAUTH2_CLIENTS__1_SCOPES__1
+          valueFrom:
+            secretKeyRef:
+              name: auth-service-secret
+              key: clients-1-scopes-1
+        - name: SPRING_SECURITY_OAUTH2_CLIENTS__1_ACCESSTOKENVALIDITYSECONDS
+          valueFrom:
+            secretKeyRef:
+              name: auth-service-secret
+              key: clients-1-access-token-validity 
+        - name: SPRING_SECURITY_OAUTH2_CLIENTS__1_REFRESHTOKENVALIDITYSECONDS
+          valueFrom:
+            secretKeyRef:
+              name: auth-service-secret
+              key: clients-1-refresh-token-validity    
+        - name: SPRING_SECURITY_OAUTH2_USERS__0_NAME
+          valueFrom:
+            secretKeyRef:
+              name: auth-service-secret
+              key: users-0-name   
+        - name: SPRING_SECURITY_OAUTH2_USERS__0_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: auth-service-secret
+              key: users-0-password
+        - name: SPRING_SECURITY_OAUTH2_USERS__0_AUTHORITIES__0
+          valueFrom:
+            secretKeyRef:
+              name: auth-service-secret
+              key: users-0-authority                                                                    
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: auth-service
+  labels:
+    app: auth-service
+    tier: microservice
+spec:
+  type: NodePort
+  ports:
+    - protocol: "TCP"
+      port: 7070
+      targetPort: 3090
+  selector:
+    app: auth-service 
+    tier: microservice
+    

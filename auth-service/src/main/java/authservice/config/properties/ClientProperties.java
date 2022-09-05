@@ -30,7 +30,7 @@ import java.util.stream.Collectors;
  * Client properties loaded from the configuration file.
  */
 @Configuration
-@ConfigurationProperties(prefix = "oauth")
+@ConfigurationProperties(prefix = "spring.security.oauth2")
 @Component
 public class ClientProperties {
     private List<Client> clients;

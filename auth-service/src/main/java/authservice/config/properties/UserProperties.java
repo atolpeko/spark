@@ -30,7 +30,7 @@ import java.util.stream.Collectors;
  * User properties loaded from the configuration file.
  */
 @Configuration
-@ConfigurationProperties(prefix = "oauth")
+@ConfigurationProperties(prefix = "spring.security.oauth2")
 @Component
 public class UserProperties {
     private List<User> users;

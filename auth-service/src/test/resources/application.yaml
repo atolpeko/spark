@@ -18,20 +18,21 @@ spring:
     username: sa
     password:
     driverClassName: org.h2.Driver
-oauth:
-  jwt-key: test-key
-  clients:
-    - name: test-client
-      password:  test-password
-      grantTypes:
-        - password
-      scopes:
-        - read
-        - write
-      accessTokenValiditySeconds: 1800
-      refreshTokenValiditySeconds: 43200
-  users:
-    - name: test-admin
-      password: test-password
-      authorities:
-        - ADMIN
+  security:
+    oauth2:
+      jwt-key: test-key
+      clients:
+        - name: test-client
+          password:  test-password
+          grantTypes:
+            - password
+          scopes:
+            - read
+            - write
+          accessTokenValiditySeconds: 1800
+          refreshTokenValiditySeconds: 43200
+      users:
+        - name: test-admin
+          password: test-password
+          authorities:
+            - ADMIN

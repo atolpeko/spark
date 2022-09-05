@@ -47,7 +47,7 @@ public class AuthServiceConfiguration extends AuthorizationServerConfigurerAdapt
     private final PasswordEncoder passwordEncoder;
     private final ClientProperties clientProperties;
 
-    @Value("${oauth.jwt-key}")
+    @Value("${spring.security.oauth2.jwt-key}")
     private String jwtKey;
 
     @Autowired
@@ -99,7 +99,7 @@ public class AuthServiceConfiguration extends AuthorizationServerConfigurerAdapt
         Map<String, ClientDetails> clientDetailsStore = new HashMap<>();
         clientProperties.getClients().forEach(client -> {
             BaseClientDetails clientDetails = extractClientDetails(client);
-            clientDetailsStore.put(client.getName(), extractClientDetails(client));
+            clientDetailsStore.put(client.getName(), clientDetails);
         });
 
         return clientDetailsStore;

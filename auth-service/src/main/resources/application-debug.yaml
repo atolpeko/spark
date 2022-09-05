@@ -18,30 +18,31 @@ spring:
     username: sa
     password:
     driverClassName: org.h2.Driver
-oauth:
-  jwt-key: debug-key
-  clients:
-    - name: debug-client
-      password:  debug-password
-      grantTypes:
-        - password
-      scopes:
-        - read
-        - write
-      accessTokenValiditySeconds: 1800
-      refreshTokenValiditySeconds: 43200
+  security:
+    oauth2:
+      jwt-key: debug-key
+      clients:
+        - name: debug-client
+          password:  debug-password
+          grantTypes:
+            - password
+          scopes:
+            - read
+            - write
+          accessTokenValiditySeconds: 1800
+          refreshTokenValiditySeconds: 43200
 
-    - name: debug-internal-client
-      password: client_credentials
-      grantTypes:
-        - password
-      scopes:
-        - read
-        - write
-      accessTokenValiditySeconds: 1800
-      refreshTokenValiditySeconds: 43200
-  users:
-    - name: debug-admin
-      password: debug-password
-      authorities:
-        - ADMIN
+        - name: debug-internal-client
+          password: debug-password
+          grantTypes:
+            - client_credentials
+          scopes:
+            - read
+            - write
+          accessTokenValiditySeconds: 1800
+          refreshTokenValiditySeconds: 43200
+      users:
+        - name: debug-admin
+          password: debug-password
+          authorities:
+            - ADMIN
