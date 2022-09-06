@@ -27,3 +27,8 @@ spring:
         authorization-grant-type: client_credentials
         scope: read
         access-token-uri: http://localhost:9000/oauth/token
+management:
+  endpoint:
+    health:
+      probes:
+        enabled: true

@@ -22,6 +22,17 @@ spec:
         image: ${SPARK_REP_PREFIX}/user-service:${SPARK_VERSION}
         ports:
           - containerPort: 3070
+        livenessProbe:
+          httpGet:
+            port: 3070
+            path: /actuator/health/liveness
+          initialDelaySeconds: 200
+          periodSeconds: 10
+        readinessProbe:
+          httpGet:
+            port: 3070
+            path: /actuator/health/readiness
+          initialDelaySeconds: 15  
         env:
         - name: SPRING_PROFILES_ACTIVE
           value: prod
