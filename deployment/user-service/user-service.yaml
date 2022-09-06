@@ -19,7 +19,7 @@ spec:
     spec:
       containers:
       - name: user-service
-        image: atolpeko/user-service:1.0
+        image: ${SPARK_REP_PREFIX}/user-service:${SPARK_VERSION}
         ports:
           - containerPort: 3070
         env:
