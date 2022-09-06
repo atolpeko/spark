@@ -29,3 +29,8 @@ spring:
         access-token-uri: http://localhost:9000/oauth/token
 feign:
   user-service-url: http://localhost:5960/
+management:
+  endpoint:
+    health:
+      probes:
+        enabled: true
