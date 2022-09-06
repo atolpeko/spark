@@ -46,3 +46,8 @@ spring:
           password: debug-password
           authorities:
             - ADMIN
+management:
+  endpoint:
+    health:
+      probes:
+        enabled: true

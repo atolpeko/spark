@@ -7,3 +7,8 @@ spring:
       ddl-auto: update
   datasource:
     driverClassName: com.mysql.cj.jdbc.Driver
+management:
+  endpoint:
+    health:
+      probes:
+        enabled: true

@@ -19,9 +19,20 @@ mvn clean deploy
 ## Run locally
 
 You can spin up the Kubernetes deployment locally using Minikube.
-Give the `minikube_run` shell script the right to execute and run it.
+The first step is to start minikube cluster.
+
 ```
 minikube start
+```
+
+Then, enable ingress addon.
+
+```
+minikube addons enable ingress
+```
+
+Give the `minikube_run` shell script the right to execute and run it.
+```
 chmod +x minikube_run.sh 
 export SPARK_VERSION=...  
 ./minikube_run.sh 
@@ -34,15 +45,15 @@ export SPARK_VERSION=...
 Spark serves clients on port 80, providing information dynamically through HATEOAS.
 
 All spark endpoints follow the REST API Resource naming conventions. It exposes the following endpoints:
- * http://localhost/users
- * http://localhost/communities
- * http://localhost/communities{id}/posts
- * http://localhost/communities{id}/posts{id}/comments
- * http://localhost/communities{id}/posts{id}/likes
- * http://localhost/communities{id}/posts{id}/comments{id}/likes
+ * http://localhost/api/users
+ * http://localhost/api/communities
+ * http://localhost/api/communities{id}/posts
+ * http://localhost/api/communities{id}/posts{id}/comments
+ * http://localhost/api/communities{id}/posts{id}/likes
+ * http://localhost/api/communities{id}/posts{id}/comments{id}/likes
 
 
-Spark declares 2 user roles: Users and Admins. To authenticate and obtain an access token, hit the `http://localhost/oauth/token` endpoint with the following parameters:
+Spark declares 2 user roles: Users and Admins. To authenticate and obtain an access token, hit the `http://localhost/api/oauth/token` endpoint with the following parameters:
 
 ```
 grant_type: password

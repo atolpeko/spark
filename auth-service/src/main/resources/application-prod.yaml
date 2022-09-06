@@ -4,3 +4,8 @@ spring:
   jpa:
     database: MYSQL
     generate-ddl: false
+management:
+  endpoint:
+    health:
+      probes:
+        enabled: true
